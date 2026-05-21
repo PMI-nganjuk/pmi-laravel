@@ -5,6 +5,9 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use App\Enums\RoleEnum;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Http\Request;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +27,16 @@ class AppServiceProvider extends ServiceProvider
         // Implicitly grant "Admin" role all permissions
         Gate::before(function ($user, $ability) {
             return $user->hasRole(RoleEnum::ADMIN) ? true : null;
+        });
+
+        // Define gate to restrict user management to Admins only
+        Gate::define('manage-users', function ($user) {
+            return false; // Normal users are denied; Admins bypass this via Gate::before
+        });
+
+        // Define a strict rate limiter for login requests (5 attempts per minute per IP)
+        RateLimiter::for('login', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip());
         });
     }
 }
