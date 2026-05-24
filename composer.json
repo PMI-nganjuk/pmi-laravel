@@ -12,6 +12,7 @@
         "laravel/tinker": "^3.0",
         "livewire/livewire": "^4.3",
         "maatwebsite/excel": "^3.1",
+        "owenvoke/blade-fontawesome": "^3.2",
         "spatie/laravel-activitylog": "^5.0"
     },
     "require-dev": {

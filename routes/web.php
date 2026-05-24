@@ -4,9 +4,27 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChartOfAccountController;
+
+Route::resource('coa', ChartOfAccountController::class)->except(['show', 'edit']);
+
+Route::prefix('coa')
+    ->name('coa.')
+    ->group(function () {
+
+        Route::get(
+            '/category-two',
+            [ChartOfAccountController::class, 'getCategoryTwo']
+        )->name('category-two');
+
+        Route::get(
+            '/generate-code',
+            [ChartOfAccountController::class, 'generateCode']
+        )->name('generate-code');
+    });
 
 // Redirect root to dashboard (which automatically handles auth/guest redirects)
-Route::redirect('/', '/dashboard');
+Route::redirect('/', '/welcome');
 
 // Authentication routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
@@ -25,4 +43,3 @@ Route::middleware(['auth', 'can:manage-users'])->prefix('dashboard/users')->name
     Route::put('/{user}', [UserController::class, 'update'])->name('update');
     Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
 });
-
