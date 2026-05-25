@@ -9,7 +9,7 @@
 ])
 
 @php
-    $baseClasses = 'inline-flex items-center justify-center font-semibold transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-base disabled:opacity-50 disabled:cursor-not-allowed';
+    $baseClasses = 'inline-flex items-center justify-center font-semibold transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-base disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
     
     $sizes = [
         'sm' => 'gap-1.5 py-1.5 px-3 rounded-lg text-xs',
