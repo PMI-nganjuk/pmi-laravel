@@ -34,18 +34,6 @@ class UserController extends Controller
     }
 
     /**
-     * Show the form for creating a new user.
-     */
-    public function create()
-    {
-        Gate::authorize('manage-users');
-
-        $roles = RoleEnum::cases();
-
-        return view('users.create', compact('roles'));
-    }
-
-    /**
      * Store a newly created user in storage (registration).
      */
     public function store(UserRequest $request)
@@ -56,18 +44,6 @@ class UserController extends Controller
 
         return redirect()->route('users.index')
             ->with('success', 'Pengguna ' . $user->name . ' berhasil didaftarkan.');
-    }
-
-    /**
-     * Show the form for editing the specified user.
-     */
-    public function edit(User $user)
-    {
-        Gate::authorize('manage-users');
-
-        $roles = RoleEnum::cases();
-
-        return view('users.edit', compact('user', 'roles'));
     }
 
     /**
