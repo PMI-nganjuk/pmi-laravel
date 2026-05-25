@@ -71,7 +71,7 @@ class UserManagementTest extends TestCase
 
         $response1 = $this->actingAs($admin)->get('/dashboard/users');
         $response1->assertStatus(200);
-        $response1->assertSee('Daftar Pengguna Terdaftar');
+        $response1->assertSee('Manajemen Akun');
 
         $response2 = $this->actingAs($admin)->get('/dashboard/users/create');
         $response2->assertStatus(200);

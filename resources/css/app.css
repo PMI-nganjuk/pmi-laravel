@@ -7,6 +7,123 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+  --color-background-base: var(--color-slate-50);
+  
+  /* Surface Colors */
+  --color-surface-base: var(--color-white);
+  --color-surface-hover: var(--color-slate-50);
+  --color-surface-muted: var(--color-slate-100);
+  --color-surface-border: var(--color-slate-200);
+  
+  --color-content-base: var(--color-slate-900);
+  --color-content-muted: var(--color-slate-500);
+  --color-content-subtle: var(--color-slate-400);
+  --color-content-inverse: var(--color-white);
+
+  /* Semantic / State Colors */
+  --color-state-primary: var(--color-primary-600);
+  --color-state-primary-hover: var(--color-red-700);
+  --color-state-primary-ring: oklch(from var(--color-state-primary) l c h / 0.2);
+
+  --color-primary: var(--color-state-primary);
+  --color-primary-hover: var(--color-state-primary-hover);
+  --color-primary-ring: var(--color-state-primary-ring);
+  
+  --color-state-secondary: var(--color-slate-100);
+  --color-state-secondary-hover: var(--color-slate-200);
+
+  /* Semantic Colors */
+  --color-primary-50: var(--color-red-50);
+  --color-primary-500: var(--color-red-500);
+  --color-primary-600: var(--color-red-600);
+
+  /* State Colors */
+  --color-state-error: var(--color-red-500);
+
+  --color-state-success: var(--color-emerald-500);
+  --color-state-success-bg: var(--color-emerald-50);
+  --color-state-success-border: var(--color-emerald-200);
+  --color-state-success-hover: oklch(from var(--color-state-success) calc(l + 0.3) c h);
+  --color-state-success-hover-bg: oklch(from var(--color-state-success-bg) calc(l + 0.3) c h);
+  --color-state-success-active: oklch(from var(--color-state-success) calc(l - 0.2) c h);
+  --color-state-success-active-bg: oklch(from var(--color-state-success-bg) calc(l - 0.2) c h);
+  --color-state-success-text: var(--color-emerald-700);
+  --color-success: var(--color-state-success);
+  --color-success-bg: var(--color-state-success-bg);
+  --color-success-border: var(--color-state-success-border);
+  --color-success-text: var(--color-state-success-text);
+
+  --color-state-danger: var(--color-red-600);
+  --color-state-danger-bg: var(--color-red-50);
+  --color-state-danger-border: var(--color-red-200);
+  --color-state-danger-hover: var(--color-red-100);
+  --color-state-danger-text: var(--color-red-700);
+  --color-danger: var(--color-state-danger);
+  --color-danger-bg: var(--color-state-danger-bg);
+  --color-danger-border: var(--color-state-danger-border);
+  --color-danger-hover: var(--color-state-danger-hover);
+  --color-danger-text: var(--color-state-danger-text);
+
+  --color-state-info: var(--color-blue-500);
+  --color-state-info-hover: oklch(from var(--color-state-info) calc(l - 0.2) c h);
+  --color-state-info-hover-bg: oklch(from var(--color-state-info-bg) calc(l - 0.2) c h);
+  --color-state-info-bg: var(--color-blue-50);
+  --color-state-info-border: var(--color-blue-200);
+  --color-state-info-text: var(--color-blue-700);
+  --color-info: var(--color-state-info);
+  --color-info-bg: var(--color-state-info-bg);
+  --color-info-border: var(--color-state-info-border);
+  --color-info-hover: var(--color-state-info-hover);
+  --color-info-text: var(--color-state-info-text);
+  
+  --color-state-warning: var(--color-amber-500);
+  --color-state-warning-bg: var(--color-amber-50);
+  --color-state-warning-border: var(--color-amber-200);
+  --color-state-warning-text: var(--color-amber-800);
+  --color-warning: var(--color-state-warning);
+  --color-warning-bg: var(--color-state-warning-bg);
+  --color-warning-border: var(--color-state-warning-border);
+  --color-warning-text: var(--color-state-warning-text);
+
+  --color-state-accent: var(--color-purple-500);
+  --color-state-accent-bg: var(--color-purple-50);
+  --color-state-accent-border: var(--color-purple-200);
+  --color-state-accent-text: var(--color-purple-700);
+  --color-accent: var(--color-state-accent);
+  --color-accent-bg: var(--color-state-accent-bg);
+  --color-accent-border: var(--color-state-accent-border);
+  --color-accent-text: var(--color-state-accent-text);
+}
+
+@layer components {
+  .coa-page {
+    @apply min-h-screen bg-background-base font-sans text-content-base flex;
+  }
+
+  .coa-main {
+    @apply flex-1 overflow-y-auto p-4 space-y-4 sm:p-6 sm:space-y-6;
+  }
+
+  .coa-alert {
+    @apply flex items-center gap-3 rounded-xl border px-4 py-3 text-sm shadow-sm;
+  }
+
+  .coa-alert-success {
+    @apply border-success-border bg-success-bg text-success-text;
+  }
+
+  .coa-alert-danger {
+    @apply border-danger-border bg-danger-bg text-danger-text;
+  }
+
+  .coa-filter-select {
+    @apply block w-full appearance-none rounded-xl border border-surface-border bg-surface-base py-2.5 pl-4 pr-10 text-sm text-content-base transition duration-200 hover:border-content-subtle focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-ring disabled:cursor-not-allowed disabled:bg-surface-muted disabled:opacity-60;
+  }
+
+  .coa-panel {
+    @apply rounded-xl border border-surface-border bg-surface-base p-4 shadow-sm sm:p-6;
+  }
 }

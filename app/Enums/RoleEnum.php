@@ -19,4 +19,15 @@ enum RoleEnum: string
     {
         return array_column(self::cases(), 'value');
     }
+
+    public function getBadgeVariant(): string
+    {
+        return match($this) {
+            self::ADMIN => 'error',
+            self::FINANCIAL_MANAGER => 'accent',
+            self::FINANCE_STAFF => 'info',
+            self::STAFF => 'warning',
+            default => 'neutral',
+        };
+    }
 }
