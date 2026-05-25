@@ -34,6 +34,11 @@ class AppServiceProvider extends ServiceProvider
             return false; // Normal users are denied; Admins bypass this via Gate::before
         });
 
+        // Define gate to restrict settings management to Admins only
+        Gate::define('manage-settings', function ($user) {
+            return false; // Normal users are denied; Admins bypass this via Gate::before
+        });
+
         // Define a strict rate limiter for login requests (5 attempts per minute per IP)
         RateLimiter::for('login', function (Request $request) {
             return Limit::perMinute(5)->by($request->ip());
