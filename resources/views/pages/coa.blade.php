@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div
+    <x-layout.shell
         class="coa-page"
         x-data="createCoaPageComponent({
             storeUrl: @js(route('coa.store')),
@@ -18,23 +18,7 @@
         x-on:click="handlePageClick($event)"
         x-on:submit="handlePageSubmit($event)"
     >
-        <div class="fixed inset-0 z-40 bg-content-base/60 backdrop-blur-sm lg:hidden"
-             x-show="sidebarOpen"
-             x-transition:enter="transition-opacity ease-linear duration-300"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-100"
-             x-transition:leave="transition-opacity ease-linear duration-300"
-             x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0"
-             @click="sidebarOpen = false"
-             style="display: none;"></div>
-
-        <x-layout.sidebar />
-
-        <div class="flex-1 flex flex-col min-w-0">
-            <x-layout.header />
-
-            <main class="coa-main">
+        <main class="coa-main">
                 @if (session('success'))
                     <x-atoms.alert variant="success">
                         {{ session('success') }}
@@ -183,6 +167,5 @@
                     </div>
                 </x-organisms.datatable-wrapper>
             </main>
-        </div>
-    </div>
+    </x-layout.shell>
 </x-app-layout>

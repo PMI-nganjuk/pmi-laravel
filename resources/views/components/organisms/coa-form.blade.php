@@ -153,7 +153,7 @@
                 <span x-show="loadingSubmit" x-cloak>
                     Menyimpan...
                 </span>
-                <span x-show="!loadingSubmit" x-text="editingId ? 'Simpan Perubahan' : 'Simpan COA'"></span>
+                <span x-show="!loadingSubmit" x-text="editingId ? 'Simpan Perubahan' : 'Simpan COA'">Simpan COA</span>
             </x-atoms.button>
         </div>
     </form>

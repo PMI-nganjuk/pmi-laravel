@@ -29,6 +29,13 @@ class Sidebar extends Component
             'active'=> request()->routeIs('dashboard')
         ];
 
+        $menu[] = [
+            'label' => 'Program Kerja',
+            'route' => 'programs.index',
+            'icon'  => 'briefcase',
+            'active'=> request()->routeIs('programs.*')
+        ];
+
         // Admin Only
         if ($user->hasRole(RoleEnum::ADMIN)) {
             $menu[] = [

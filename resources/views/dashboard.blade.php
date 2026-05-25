@@ -1,27 +1,7 @@
 <x-app-layout>
-    <div class="min-h-screen bg-slate-50 font-sans text-slate-900 flex" x-data="{ sidebarOpen: false }">
-        <!-- Mobile Sidebar Overlay -->
-        <div class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm lg:hidden"
-             x-show="sidebarOpen"
-             x-transition:enter="transition-opacity ease-linear duration-300"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-100"
-             x-transition:leave="transition-opacity ease-linear duration-300"
-             x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0"
-             @click="sidebarOpen = false"
-             style="display: none;"></div>
-
-        <!-- Sidebar -->
-        <x-layout.sidebar />
-
-        <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col min-w-0">
-            <!-- Topbar header -->
-            <x-layout.header />
-
-            <!-- Dashboard Body -->
-            <main class="flex-1 overflow-y-auto p-6 space-y-6">
+    <x-layout.shell>
+        <!-- Dashboard Body -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6">
                 <!-- Welcome card -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm relative overflow-hidden group">
                     <div class="relative z-10 max-w-lg">
@@ -217,7 +197,6 @@
                         </div>
                     </div>
                 </div>
-            </main>
-        </div>
-    </div>
+        </main>
+    </x-layout.shell>
 </x-app-layout>
