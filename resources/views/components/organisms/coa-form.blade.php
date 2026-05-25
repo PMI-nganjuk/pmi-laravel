@@ -7,7 +7,6 @@
 <x-atoms.surface
     tag="section"
     x-ref="coaPanel"
-    x-show="showForm"
     x-cloak
     x-transition
     aria-labelledby="coa-form-title"
@@ -143,16 +142,6 @@
         </x-atoms.input>
 
         <div class="mt-2 flex flex-col-reverse gap-3 border-t border-surface-border pt-5 sm:flex-row sm:justify-end md:col-span-2">
-            <x-atoms.button
-                type="button"
-                variant="outline"
-                size="md"
-                x-on:click="closeForm()"
-                aria-label="Close form"
-            >
-                Tutup
-            </x-atoms.button>
-
             <x-atoms.button
                 type="submit"
                 variant="primary"

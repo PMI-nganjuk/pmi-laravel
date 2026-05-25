@@ -6,7 +6,6 @@
             updateBaseUrl: @js(url('/coa')),
             categoryTwoUrl: @js(route('coa.category-two')),
             generateCodeUrl: @js(route('coa.generate-code')),
-            initialShowForm: @js($errors->any() || old('account_name') !== null),
             initialEditingId: @js(old('_editing_id', '')),
             initialCategoryOne: @js(old('category_one', '')),
             initialCategoryTwo: @js(old('category_two', '')),
@@ -57,28 +56,6 @@
                         </ul>
                     </x-atoms.alert>
                 @endif
-
-                <section class="coa-panel flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between" aria-labelledby="coa-page-title">
-                    <div>
-                        <h2 id="coa-page-title" class="text-xl font-bold text-content-base">Daftar Chart of Accounts</h2>
-                        <p class="mt-1 max-w-2xl text-sm text-content-muted">
-                            Kelola kode akun, kategori, posisi saldo, dan relasi laporan untuk pencatatan keuangan PMI.
-                        </p>
-                    </div>
-
-                    <x-atoms.button
-                        type="button"
-                        variant="primary"
-                        size="md"
-                        x-on:click="toggleCreateForm()"
-                        aria-controls="coa-form-title"
-                    >
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                        </svg>
-                        <span x-text="showForm && !editingId ? 'Tutup Form' : 'Tambah COA'"></span>
-                    </x-atoms.button>
-                </section>
 
                 <x-organisms.coa-form
                     :category-one-options="$categoryOneOptions"
@@ -143,7 +120,6 @@
 
                                     <x-atoms.table-cell>
                                         <div class="font-semibold text-content-base">{{ $coa->account_name }}</div>
-                                        <div class="mt-0.5 text-xs text-content-subtle">COA {{ $coa->id }}</div>
                                     </x-atoms.table-cell>
 
                                     <x-atoms.table-cell>
