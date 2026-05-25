@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChartOfAccountController;
@@ -56,4 +57,11 @@ Route::middleware(['auth', 'can:manage-users'])->prefix('dashboard/users')->name
 Route::middleware(['auth', 'can:manage-settings'])->prefix('dashboard/settings')->name('settings.')->group(function () {
     Route::get('/', [SettingController::class, 'index'])->name('index');
     Route::put('/', [SettingController::class, 'update'])->name('update');
+});
+
+// Profile routes — accessible by all authenticated users
+Route::middleware('auth')->prefix('profile')->name('profile.')->group(function () {
+    Route::get('/', [ProfileController::class, 'show'])->name('show');
+    Route::put('/info', [ProfileController::class, 'updateInfo'])->name('update-info');
+    Route::put('/password', [ProfileController::class, 'updatePassword'])->name('update-password');
 });

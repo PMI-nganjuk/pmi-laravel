@@ -20,7 +20,7 @@
             
             <!-- Static links like profile can stay here or be moved to the array -->
             <div class="pt-4 mt-4 border-t border-slate-200">
-                <x-molecules.nav-link route="profile.show" icon="user" label="Profil Saya" />
+                <x-molecules.nav-link route="profile.show" icon="user" label="Profil Saya" :active="request()->routeIs('profile.*')" />
             </div>
         </nav>
     </div>
