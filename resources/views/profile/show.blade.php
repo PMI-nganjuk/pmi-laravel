@@ -13,9 +13,6 @@
 
             {{-- ── Avatar & Nama ─────────────────────────────────────────── --}}
             <x-atoms.surface tag="div" class="flex items-center gap-5">
-                <div class="h-20 w-20 shrink-0 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center text-2xl font-extrabold text-primary select-none">
-                    {{ strtoupper(substr($user->name, 0, 2)) }}
-                </div>
                 <div>
                     <p class="text-xs font-bold uppercase tracking-normal text-primary">Akun Aktif</p>
                     <h2 class="mt-0.5 text-lg font-bold text-content-base">{{ $user->name }}</h2>
