@@ -79,26 +79,26 @@
                     <div class="pt-4 border-t border-surface-border">
                         <h3 class="text-sm font-bold text-content-base border-l-4 border-primary pl-2 mb-4">Pengurus</h3>
                         <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
-                            <x-atoms.input
-                                name="chairperson"
-                                label="Ketua"
-                                x-model="chairperson"
-                                placeholder="Nama Ketua"
-                            />
-                            
-                            <x-atoms.input
-                                name="headquarters_treasurer"
-                                label="Bendahara Markas"
-                                x-model="headquartersTreasurer"
-                                placeholder="Nama Bendahara Markas"
-                            />
+                            <x-atoms.input as="select" name="chairperson" label="Ketua" x-model="chairperson">
+                                <option value="">-- Pilih Ketua --</option>
+                                @foreach ($userNames as $userName)
+                                    <option value="{{ $userName }}">{{ $userName }}</option>
+                                @endforeach
+                            </x-atoms.input>
 
-                            <x-atoms.input
-                                name="blood_donation_unit_treasurer"
-                                label="Bendahara UDD"
-                                x-model="bloodDonationUnitTreasurer"
-                                placeholder="Nama Bendahara UDD"
-                            />
+                            <x-atoms.input as="select" name="headquarters_treasurer" label="Bendahara Markas" x-model="headquartersTreasurer">
+                                <option value="">-- Pilih Bendahara Markas --</option>
+                                @foreach ($userNames as $userName)
+                                    <option value="{{ $userName }}">{{ $userName }}</option>
+                                @endforeach
+                            </x-atoms.input>
+
+                            <x-atoms.input as="select" name="blood_donation_unit_treasurer" label="Bendahara UDD" x-model="bloodDonationUnitTreasurer">
+                                <option value="">-- Pilih Bendahara UDD --</option>
+                                @foreach ($userNames as $userName)
+                                    <option value="{{ $userName }}">{{ $userName }}</option>
+                                @endforeach
+                            </x-atoms.input>
                         </div>
                     </div>
 

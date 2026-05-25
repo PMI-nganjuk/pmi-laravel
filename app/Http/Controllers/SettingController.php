@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OrganizationProfileRequest;
+use App\Models\User;
 use App\Services\OrganizationProfileService;
 use Illuminate\Support\Facades\Gate;
 
@@ -20,8 +21,9 @@ class SettingController extends Controller
         Gate::authorize('manage-settings');
 
         $profile = $this->profileService->getProfile();
+        $userNames = User::orderBy('name')->pluck('name');
 
-        return view('pages.settings', compact('profile'));
+        return view('pages.settings', compact('profile', 'userNames'));
     }
 
     /**
