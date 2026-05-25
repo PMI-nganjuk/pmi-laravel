@@ -154,6 +154,7 @@
     <script>
         function initSettingsPage() {
             Alpine.data('settingsPage', () => ({
+                sidebarOpen: false,
                 organizationName: @js(old('organization_name', $profile->organization_name ?? '')),
                 address: @js(old('address', $profile->address ?? '')),
                 chairperson: @js(old('chairperson', $profile->chairperson ?? '')),
