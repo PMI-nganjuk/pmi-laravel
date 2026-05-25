@@ -30,6 +30,105 @@
             @endif
 
 
+            <!-- User Form (Inline) -->
+            <x-atoms.surface
+                tag="section"
+                x-ref="userPanel"
+                aria-labelledby="user-form-title"
+            >
+                <div class="mb-6 flex flex-col justify-between gap-4 border-b border-surface-border pb-5 sm:flex-row sm:items-start">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-normal text-primary" x-text="editingId ? 'Mode edit' : 'Input baru'"></p>
+                        <h2 id="user-form-title" class="mt-1 text-lg font-bold text-content-base" x-text="editingId ? 'Edit Akun Pengguna' : 'Tambah Akun Pengguna'"></h2>
+                        <p class="mt-1 text-sm text-content-muted" x-text="editingId ? 'Perbarui informasi akun pengguna dan peran sistemnya.' : 'Daftarkan akun pengguna baru dengan menetapkan peran (role) yang tepat.'"></p>
+                    </div>
+
+                    <x-atoms.button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        x-show="editingId"
+                        x-on:click="cancelEdit()"
+                        aria-label="Batal edit pengguna"
+                        style="display: none;"
+                    >
+                        Batal Edit
+                    </x-atoms.button>
+                </div>
+
+                <form
+                    x-ref="userForm"
+                    x-bind:action="formAction"
+                    method="POST"
+                    x-on:submit.prevent="submitForm()"
+                    class="grid grid-cols-1 gap-5 md:grid-cols-2"
+                    novalidate
+                >
+                    @csrf
+
+                    <template x-if="editingId">
+                        <input type="hidden" name="_method" value="PUT">
+                    </template>
+
+                    <input type="hidden" name="_editing_id" x-model="editingId">
+
+                    <!-- Name field -->
+                    <x-atoms.input
+                        name="name"
+                        label="Nama Lengkap"
+                        required
+                        x-model="name"
+                        placeholder="Masukkan nama lengkap"
+                    />
+
+                    <!-- Email field -->
+                    <x-atoms.input
+                        name="email"
+                        type="email"
+                        label="Alamat Email"
+                        required
+                        x-model="email"
+                        placeholder="nama@pmi-nganjuk.or.id"
+                    />
+
+                    <!-- Role field selection -->
+                    <x-atoms.input as="select" name="role" label="Peran Sistem (Role)" x-model="role" required>
+                        <option value="" disabled>Pilih peran pengguna</option>
+                        @foreach ($roles as $r)
+                            <option value="{{ $r->value }}">
+                                {{ $r->getLabel() }}
+                            </option>
+                        @endforeach
+                    </x-atoms.input>
+
+                    <!-- Password field -->
+                    <x-atoms.input
+                        name="password"
+                        type="password"
+                        x-model="password"
+                        x-bind:label="editingId ? 'Kata Sandi Baru (Kosongkan jika tidak ingin mengubah)' : 'Kata Sandi Sementara'"
+                        x-bind:required="!editingId"
+                        placeholder="Minimal 8 karakter"
+                    />
+
+                    <!-- Submit Button -->
+                    <div class="mt-2 flex flex-col-reverse gap-3 border-t border-surface-border pt-5 sm:flex-row sm:justify-end md:col-span-2">
+                        <x-atoms.button
+                            type="submit"
+                            variant="primary"
+                            size="md"
+                            x-bind:disabled="loadingSubmit"
+                            x-bind:aria-busy="loadingSubmit"
+                        >
+                            <span x-show="loadingSubmit" x-cloak>
+                                Menyimpan...
+                            </span>
+                            <span x-show="!loadingSubmit" x-text="editingId ? 'Simpan Perubahan' : 'Registrasikan Akun'">Registrasikan Akun</span>
+                        </x-atoms.button>
+                    </div>
+                </form>
+            </x-atoms.surface>
+
             <!-- Users table card with datatable wrapper -->
             <x-organisms.datatable-wrapper
                 :endpoint="route('users.index')"
@@ -145,105 +244,6 @@
                     @endif
                 </div>
             </x-organisms.datatable-wrapper>
-
-            <!-- User Form (Inline, similar to COA) -->
-            <x-atoms.surface
-                tag="section"
-                x-ref="userPanel"
-                aria-labelledby="user-form-title"
-            >
-                <div class="mb-6 flex flex-col justify-between gap-4 border-b border-surface-border pb-5 sm:flex-row sm:items-start">
-                    <div>
-                        <p class="text-xs font-bold uppercase tracking-normal text-primary" x-text="editingId ? 'Mode edit' : 'Input baru'"></p>
-                        <h2 id="user-form-title" class="mt-1 text-lg font-bold text-content-base" x-text="editingId ? 'Edit Akun Pengguna' : 'Tambah Akun Pengguna'"></h2>
-                        <p class="mt-1 text-sm text-content-muted" x-text="editingId ? 'Perbarui informasi akun pengguna dan peran sistemnya.' : 'Daftarkan akun pengguna baru dengan menetapkan peran (role) yang tepat.'"></p>
-                    </div>
-
-                    <x-atoms.button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        x-show="editingId"
-                        x-on:click="cancelEdit()"
-                        aria-label="Batal edit pengguna"
-                        style="display: none;"
-                    >
-                        Batal Edit
-                    </x-atoms.button>
-                </div>
-
-                <form
-                    x-ref="userForm"
-                    x-bind:action="formAction"
-                    method="POST"
-                    x-on:submit.prevent="submitForm()"
-                    class="grid grid-cols-1 gap-5 md:grid-cols-2"
-                    novalidate
-                >
-                    @csrf
-
-                    <template x-if="editingId">
-                        <input type="hidden" name="_method" value="PUT">
-                    </template>
-
-                    <input type="hidden" name="_editing_id" x-model="editingId">
-
-                    <!-- Name field -->
-                    <x-atoms.input
-                        name="name"
-                        label="Nama Lengkap"
-                        required
-                        x-model="name"
-                        placeholder="Masukkan nama lengkap"
-                    />
-
-                    <!-- Email field -->
-                    <x-atoms.input
-                        name="email"
-                        type="email"
-                        label="Alamat Email"
-                        required
-                        x-model="email"
-                        placeholder="nama@pmi-nganjuk.or.id"
-                    />
-
-                    <!-- Role field selection -->
-                    <x-atoms.input as="select" name="role" label="Peran Sistem (Role)" x-model="role" required>
-                        <option value="" disabled>Pilih peran pengguna</option>
-                        @foreach ($roles as $r)
-                            <option value="{{ $r->value }}">
-                                {{ $r->getLabel() }}
-                            </option>
-                        @endforeach
-                    </x-atoms.input>
-
-                    <!-- Password field -->
-                    <x-atoms.input
-                        name="password"
-                        type="password"
-                        x-model="password"
-                        x-bind:label="editingId ? 'Kata Sandi Baru (Kosongkan jika tidak ingin mengubah)' : 'Kata Sandi Sementara'"
-                        x-bind:required="!editingId"
-                        placeholder="Minimal 8 karakter"
-                    />
-
-                    <!-- Submit Button -->
-                    <div class="mt-2 flex flex-col-reverse gap-3 border-t border-surface-border pt-5 sm:flex-row sm:justify-end md:col-span-2">
-                        <x-atoms.button
-                            type="submit"
-                            variant="primary"
-                            size="md"
-                            x-bind:disabled="loadingSubmit"
-                            x-bind:aria-busy="loadingSubmit"
-                        >
-                            <span x-show="loadingSubmit" x-cloak>
-                                Menyimpan...
-                            </span>
-                            <span x-show="!loadingSubmit" x-text="editingId ? 'Simpan Perubahan' : 'Registrasikan Akun'">Registrasikan Akun</span>
-                        </x-atoms.button>
-                    </div>
-                </form>
-            </x-atoms.surface>
         </main>
     </x-layout.shell>
 

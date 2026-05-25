@@ -30,6 +30,93 @@
             @endif
 
 
+            <!-- Program Form (Inline) -->
+            <x-atoms.surface
+                tag="section"
+                x-ref="programPanel"
+                aria-labelledby="program-form-title"
+            >
+                <div class="mb-6 flex flex-col justify-between gap-4 border-b border-surface-border pb-5 sm:flex-row sm:items-start">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-normal text-primary" x-text="editingId ? 'Mode edit' : 'Input baru'"></p>
+                        <h2 id="program-form-title" class="mt-1 text-lg font-bold text-content-base" x-text="editingId ? 'Edit Program Kerja' : 'Tambah Program Kerja'">Tambah Program Kerja</h2>
+                        <p class="mt-1 text-sm text-content-muted" x-text="editingId ? 'Perbarui informasi program kerja dan PIC pelaksana.' : 'Daftarkan program kerja baru dengan menunjuk PIC pelaksana yang tepat.'"></p>
+                    </div>
+
+                    <x-atoms.button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        x-show="editingId"
+                        x-on:click="cancelEdit()"
+                        aria-label="Batal edit program kerja"
+                        style="display: none;"
+                    >
+                        Batal Edit
+                    </x-atoms.button>
+                </div>
+
+                <form
+                    x-ref="programForm"
+                    x-bind:action="formAction"
+                    method="POST"
+                    x-on:submit.prevent="submitForm()"
+                    class="grid grid-cols-1 gap-5 md:grid-cols-2"
+                    novalidate
+                >
+                    @csrf
+
+                    <template x-if="editingId">
+                        <input type="hidden" name="_method" value="PUT">
+                    </template>
+
+                    <input type="hidden" name="_editing_id" x-model="editingId">
+
+                    <!-- Name field -->
+                    <x-atoms.input
+                        name="name"
+                        label="Nama Program Kerja"
+                        required
+                        x-model="name"
+                        placeholder="Masukkan nama program kerja"
+                    />
+
+                    <!-- PIC / User selection -->
+                    <x-atoms.input as="select" name="user_id" label="Penanggung Jawab (PIC)" x-model="userId" required>
+                        <option value="" disabled>Pilih PIC program</option>
+                        @foreach ($userOptions as $id => $name)
+                            <option value="{{ $id }}">{{ $name }}</option>
+                        @endforeach
+                    </x-atoms.input>
+
+                    <!-- Description field -->
+                    <div class="md:col-span-2">
+                        <x-atoms.input
+                            name="description"
+                            label="Keterangan Program"
+                            x-model="description"
+                            placeholder="Penjelasan ringkas mengenai sasaran or detail program kerja"
+                        />
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="mt-2 flex flex-col-reverse gap-3 border-t border-surface-border pt-5 sm:flex-row sm:justify-end md:col-span-2">
+                        <x-atoms.button
+                            type="submit"
+                            variant="primary"
+                            size="md"
+                            x-bind:disabled="loadingSubmit"
+                            x-bind:aria-busy="loadingSubmit"
+                        >
+                            <span x-show="loadingSubmit" x-cloak>
+                                Menyimpan...
+                            </span>
+                            <span x-show="!loadingSubmit" x-text="editingId ? 'Simpan Perubahan' : 'Registrasikan Program'">Registrasikan Program</span>
+                        </x-atoms.button>
+                    </div>
+                </form>
+            </x-atoms.surface>
+
             <!-- Programs table card with datatable wrapper -->
             <x-organisms.datatable-wrapper
                 :endpoint="route('programs.index')"
@@ -131,93 +218,6 @@
                     @endif
                 </div>
             </x-organisms.datatable-wrapper>
-
-            <!-- Program Form (Inline, similar to COA) -->
-            <x-atoms.surface
-                tag="section"
-                x-ref="programPanel"
-                aria-labelledby="program-form-title"
-            >
-                <div class="mb-6 flex flex-col justify-between gap-4 border-b border-surface-border pb-5 sm:flex-row sm:items-start">
-                    <div>
-                        <p class="text-xs font-bold uppercase tracking-normal text-primary" x-text="editingId ? 'Mode edit' : 'Input baru'"></p>
-                        <h2 id="program-form-title" class="mt-1 text-lg font-bold text-content-base" x-text="editingId ? 'Edit Program Kerja' : 'Tambah Program Kerja'">Tambah Program Kerja</h2>
-                        <p class="mt-1 text-sm text-content-muted" x-text="editingId ? 'Perbarui informasi program kerja dan PIC pelaksana.' : 'Daftarkan program kerja baru dengan menunjuk PIC pelaksana yang tepat.'"></p>
-                    </div>
-
-                    <x-atoms.button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        x-show="editingId"
-                        x-on:click="cancelEdit()"
-                        aria-label="Batal edit program kerja"
-                        style="display: none;"
-                    >
-                        Batal Edit
-                    </x-atoms.button>
-                </div>
-
-                <form
-                    x-ref="programForm"
-                    x-bind:action="formAction"
-                    method="POST"
-                    x-on:submit.prevent="submitForm()"
-                    class="grid grid-cols-1 gap-5 md:grid-cols-2"
-                    novalidate
-                >
-                    @csrf
-
-                    <template x-if="editingId">
-                        <input type="hidden" name="_method" value="PUT">
-                    </template>
-
-                    <input type="hidden" name="_editing_id" x-model="editingId">
-
-                    <!-- Name field -->
-                    <x-atoms.input
-                        name="name"
-                        label="Nama Program Kerja"
-                        required
-                        x-model="name"
-                        placeholder="Masukkan nama program kerja"
-                    />
-
-                    <!-- PIC / User selection -->
-                    <x-atoms.input as="select" name="user_id" label="Penanggung Jawab (PIC)" x-model="userId" required>
-                        <option value="" disabled>Pilih PIC program</option>
-                        @foreach ($userOptions as $id => $name)
-                            <option value="{{ $id }}">{{ $name }}</option>
-                        @endforeach
-                    </x-atoms.input>
-
-                    <!-- Description field -->
-                    <div class="md:col-span-2">
-                        <x-atoms.input
-                            name="description"
-                            label="Keterangan Program"
-                            x-model="description"
-                            placeholder="Penjelasan ringkas mengenai sasaran or detail program kerja"
-                        />
-                    </div>
-
-                    <!-- Submit Button -->
-                    <div class="mt-2 flex flex-col-reverse gap-3 border-t border-surface-border pt-5 sm:flex-row sm:justify-end md:col-span-2">
-                        <x-atoms.button
-                            type="submit"
-                            variant="primary"
-                            size="md"
-                            x-bind:disabled="loadingSubmit"
-                            x-bind:aria-busy="loadingSubmit"
-                        >
-                            <span x-show="loadingSubmit" x-cloak>
-                                Menyimpan...
-                            </span>
-                            <span x-show="!loadingSubmit" x-text="editingId ? 'Simpan Perubahan' : 'Registrasikan Program'">Registrasikan Program</span>
-                        </x-atoms.button>
-                    </div>
-                </form>
-            </x-atoms.surface>
         </main>
     </x-layout.shell>
 
