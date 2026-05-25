@@ -13,13 +13,13 @@
 
             {{-- ── Avatar & Nama ─────────────────────────────────────────── --}}
             <x-atoms.surface tag="div" class="flex items-center gap-5">
-                <div class="h-16 w-16 shrink-0 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center text-2xl font-extrabold text-primary select-none">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                <div class="h-20 w-20 shrink-0 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center text-2xl font-extrabold text-primary select-none">
+                    {{ strtoupper(substr($user->name, 0, 2)) }}
                 </div>
                 <div>
                     <p class="text-xs font-bold uppercase tracking-normal text-primary">Akun Aktif</p>
-                    <h2 class="mt-0.5 text-lg font-bold text-content-base">{{ Auth::user()->name }}</h2>
-                    <p class="text-sm text-content-muted">{{ Auth::user()->role->getLabel() }}</p>
+                    <h2 class="mt-0.5 text-lg font-bold text-content-base">{{ $user->name }}</h2>
+                    <p class="text-sm text-content-muted">{{ $user->role->getLabel() }}</p>
                 </div>
             </x-atoms.surface>
 
@@ -93,16 +93,6 @@
                       class="grid grid-cols-1 gap-5 md:grid-cols-2" novalidate>
                     @csrf
                     @method('PUT')
-
-                    <div class="md:col-span-2">
-                        <x-atoms.input
-                            name="current_password"
-                            type="password"
-                            label="Kata Sandi Saat Ini"
-                            required
-                            placeholder="Masukkan kata sandi lama"
-                        />
-                    </div>
 
                     <x-atoms.input
                         name="password"
