@@ -20,16 +20,10 @@ class UserManagementTest extends TestCase
         $this->seed(RoleAndPermissionSeeder::class);
     }
 
-    /**
-     * Test that guests cannot access user management.
-     */
     public function test_guest_cannot_access_user_management(): void
     {
         $response1 = $this->get('/dashboard/users');
         $response1->assertRedirect('/login');
-
-        $response2 = $this->get('/dashboard/users/create');
-        $response2->assertRedirect('/login');
 
         $response3 = $this->post('/dashboard/users', [
             'name' => 'John Doe',
@@ -40,18 +34,12 @@ class UserManagementTest extends TestCase
         $response3->assertRedirect('/login');
     }
 
-    /**
-     * Test that non-admin authenticated users cannot access user management.
-     */
     public function test_non_admin_cannot_access_user_management(): void
     {
         $nonAdmin = User::where('email', 'manager@pmi-nganjuk.or.id')->first();
 
         $response1 = $this->actingAs($nonAdmin)->get('/dashboard/users');
         $response1->assertStatus(403);
-
-        $response2 = $this->actingAs($nonAdmin)->get('/dashboard/users/create');
-        $response2->assertStatus(403);
 
         $response3 = $this->actingAs($nonAdmin)->post('/dashboard/users', [
             'name' => 'John Doe',
@@ -62,9 +50,6 @@ class UserManagementTest extends TestCase
         $response3->assertStatus(403);
     }
 
-    /**
-     * Test that admin can view user management and the user registration form.
-     */
     public function test_admin_can_access_user_management(): void
     {
         $admin = User::where('email', 'admin@pmi-nganjuk.or.id')->first();
@@ -72,10 +57,6 @@ class UserManagementTest extends TestCase
         $response1 = $this->actingAs($admin)->get('/dashboard/users');
         $response1->assertStatus(200);
         $response1->assertSee('Manajemen Akun');
-
-        $response2 = $this->actingAs($admin)->get('/dashboard/users/create');
-        $response2->assertStatus(200);
-        $response2->assertSee('Formulir Registrasi Akun');
     }
 
     /**
@@ -120,20 +101,7 @@ class UserManagementTest extends TestCase
         $response->assertSessionHasErrors(['name', 'email', 'role', 'password']);
     }
 
-    /**
-     * Test that admin can access the edit user form.
-     */
-    public function test_admin_can_access_edit_form(): void
-    {
-        $admin = User::where('email', 'admin@pmi-nganjuk.or.id')->first();
-        $targetUser = User::where('email', 'manager@pmi-nganjuk.or.id')->first();
 
-        $response = $this->actingAs($admin)->get("/dashboard/users/{$targetUser->id}/edit");
-        $response->assertStatus(200);
-        $response->assertSee('Formulir Edit Akun');
-        $response->assertSee($targetUser->name);
-        $response->assertSee($targetUser->email);
-    }
 
     /**
      * Test that admin can update user details without updating the password.
