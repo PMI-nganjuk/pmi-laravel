@@ -1,9 +1,13 @@
-<aside class="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 flex flex-col justify-between transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0"
-       :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
+<aside class="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 flex flex-col justify-between transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0"
+       :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+       x-cloak>
        
     <div>
+        <!-- Brand / Logo -->
         <div class="h-16 flex items-center px-6 border-b border-slate-200 gap-3">
-            <img src="{{ asset('images/logo.png') }}" alt="Logo PMI" class="h-8 w-auto object-contain" />
+            <div class="p-1.5 bg-red-50 border border-red-200 rounded-lg">
+                <x-atoms.icon name="logo" class="h-6 w-6 text-red-600" />
+            </div>
             <span class="font-bold text-lg text-slate-900 tracking-wider">PMI Nganjuk</span>
         </div>
 
@@ -20,7 +24,7 @@
             
             <!-- Static links like profile can stay here or be moved to the array -->
             <div class="pt-4 mt-4 border-t border-slate-200">
-                <x-molecules.nav-link route="profile.show" icon="user" label="Profil Saya" :active="request()->routeIs('profile.*')" />
+                <x-molecules.nav-link route="profile.show" icon="user" label="Profil Saya" />
             </div>
         </nav>
     </div>

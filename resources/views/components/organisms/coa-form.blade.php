@@ -11,13 +11,12 @@
     x-transition
     aria-labelledby="coa-form-title"
 >
-    <div class="mb-6 flex flex-col justify-between gap-4 border-b border-surface-border pb-5 sm:flex-row sm:items-start">
-        <div>
-            <p class="text-xs font-bold uppercase tracking-normal text-primary" x-text="editingId ? 'Mode edit' : 'Input baru'"></p>
-            <h2 id="coa-form-title" class="mt-1 text-lg font-bold text-content-base" x-text="editingId ? 'Edit Chart of Account' : 'Tambah Chart of Account'"></h2>
-            <p class="mt-1 text-sm text-content-muted" x-text="editingId ? 'Perbarui detail akun tanpa mengubah struktur kategori yang tidak diperlukan.' : 'Lengkapi kategori, nama akun, dan posisi laporan untuk menambahkan COA baru.'"></p>
-        </div>
-    </div>
+    <x-molecules.form-header 
+        id="coa-form-title"
+        badgeXText="editingId ? 'Mode edit' : 'Input baru'"
+        titleXText="editingId ? 'Edit Chart of Account' : 'Tambah Chart of Account'"
+        subtitleXText="editingId ? 'Perbarui detail akun tanpa mengubah struktur kategori yang tidak diperlukan.' : 'Lengkapi kategori, nama akun, dan posisi laporan untuk menambahkan COA baru.'"
+    />
 
     <form
         x-ref="coaForm"
@@ -130,31 +129,15 @@
             @endforeach
         </x-atoms.input>
 
-        <div class="mt-2 flex flex-col-reverse gap-3 border-t border-surface-border pt-5 sm:flex-row sm:justify-end md:col-span-2">
-            <x-atoms.button
-                type="button"
-                variant="secondary"
-                size="md"
-                x-show="editingId"
-                x-on:click="cancelEdit()"
-                aria-label="Cancel editing chart of account"
-            >
-                Batal Edit
-            </x-atoms.button>
-
-            <x-atoms.button
-                type="submit"
-                variant="primary"
-                size="md"
-                x-bind:disabled="loadingSubmit || loadingCategoryTwo || loadingCode"
-                x-bind:aria-busy="loadingSubmit"
-                aria-label="editingId ? 'Save changes to chart of account' : 'Save new chart of account'"
-            >
-                <span x-show="loadingSubmit" x-cloak>
-                    Menyimpan...
-                </span>
-                <span x-show="!loadingSubmit" x-text="editingId ? 'Simpan Perubahan' : 'Simpan COA'">Simpan COA</span>
-            </x-atoms.button>
-        </div>
+        <x-molecules.form-actions
+            cancelText="Batal Edit"
+            cancelShow="editingId"
+            cancelClick="cancelEdit()"
+            loadingShow="loadingSubmit"
+            submitDisabled="loadingSubmit || loadingCategoryTwo || loadingCode"
+            submitBusy="loadingSubmit"
+            submitXText="editingId ? 'Simpan Perubahan' : 'Simpan COA'"
+            cancelAriaLabel="Cancel editing chart of account"
+        />
     </form>
 </x-atoms.surface>

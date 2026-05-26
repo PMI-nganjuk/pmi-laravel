@@ -34,10 +34,9 @@
 @if($as === 'a' && $href)
     <a 
         href="{{ $href }}" 
-        aria-busy="{{ $loading ? 'true' : 'false' }}"
+        @if($loading) aria-busy="true" @endif
         {{ $attributes->merge(['class' => $classes]) }}
     >
-        {{-- Loading Spinner SVG --}}
         @if($loading)
             <svg class="animate-spin h-4 w-4 text-current" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -50,9 +49,10 @@
 @else
     <button 
         type="{{ $type }}"
-        {{-- Tombol mati saat disabled ATAU sedang loading agar user tidak double-submit --}}
-        {{ $disabled || $loading ? 'disabled' : '' }}
-        aria-busy="{{ $loading ? 'true' : 'false' }}"
+        {{-- Jika prop $disabled/$loading bawaan bernilai true, kunci secara statis --}}
+        @if($disabled || $loading) disabled @endif
+        @if($loading) aria-busy="true" @endif
+        
         {{ $attributes->merge(['class' => $classes]) }}
     >
         @if($loading)

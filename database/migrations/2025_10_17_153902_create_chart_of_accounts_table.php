@@ -18,8 +18,8 @@ return new class extends Migration
                   ->index()
                   ->constrained(table: 'category_twos', column: 'category_code')
                   ->cascadeOnDelete();
-            $table->string('account_name', 100);
-            $table->enum('entry_type', array_column(EntryTypeEnum::cases(), 'value'));
+            $table->string('account_name', 100)->index();
+            $table->enum('entry_type', array_column(EntryTypeEnum::cases(), 'value'))->index();
             $table->foreignId('report_type_id')
                   ->index()
                   ->constrained(table: 'report_types', column: 'id')

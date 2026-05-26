@@ -14,12 +14,7 @@ return new class extends Migration
         Schema::create('general_ledgers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('transaction_id')->index()->constrained('transactions')->cascadeOnUpdate()->restrictOnDelete();
-            $table->string('chart_of_account_id')->index();
-            $table->foreign('chart_of_account_id')
-                  ->references('id')
-                  ->on('chart_of_accounts')
-                  ->cascadeOnUpdate()
-                  ->restrictOnDelete();
+            $table->foreignId('chart_of_account_id')->index()->constrained('chart_of_accounts')->cascadeOnDelete()->cascadeOnUpdate()->restrictOnDelete();
             $table->decimal('debit', 15, 2)->default(0);
             $table->decimal('credit', 15, 2)->default(0);
             $table->string('note')->nullable();
