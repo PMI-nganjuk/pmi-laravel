@@ -54,29 +54,33 @@
                     :filters="['entry_type' => '', 'report_type_id' => '']"
                 >
                     <x-molecules.datatable-filters placeholder="Cari kode atau nama akun...">
-                        <select
+                        
+                        <x-atoms.input
+                            as="select"
                             x-model="filters.entry_type"
                             x-on:change="fetchData()"
-                            class="coa-filter-select w-full md:w-64"
+                            class="w-full md:w-64"
                             aria-label="Filter pos saldo"
                         >
                             <option value="">Semua Pos Saldo</option>
                             @foreach ($entryTypeOptions as $type)
                                 <option value="{{ $type->value }}">{{ $type->label() }}</option>
                             @endforeach
-                        </select>
+                        </x-atoms.input>
 
-                        <select
+                        <x-atoms.input
+                            as="select"
                             x-model="filters.report_type_id"
                             x-on:change="fetchData()"
-                            class="coa-filter-select w-full md:w-64"
+                            class="w-full md:w-64"
                             aria-label="Filter pos laporan"
                         >
                             <option value="">Semua Pos Laporan</option>
                             @foreach ($reportTypeOptions as $id => $name)
                                 <option value="{{ $id }}">{{ $name }}</option>
                             @endforeach
-                        </select>
+                        </x-atoms.input>
+
                     </x-molecules.datatable-filters>
 
                     <div id="data-container">

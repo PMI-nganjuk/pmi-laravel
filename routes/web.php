@@ -3,13 +3,17 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\ProgramController;
+use App\Http\Controllers\SettingController;
 
 Route::resource('coa', ChartOfAccountController::class)->except(['show', 'edit']);
+Route::resource('programs', ProgramController::class)->except(['show', 'edit'])->middleware('auth');
 Route::resource('programs', ProgramController::class)->except(['show', 'edit'])->middleware('auth');
 
 Route::prefix('coa')
@@ -28,7 +32,15 @@ Route::prefix('coa')
     });
 
 // Redirect root to welcome
+// Redirect root to welcome
 Route::redirect('/', '/welcome');
+
+Route::get('/welcome', function () {
+    return auth()->check()
+        ? redirect()->route('dashboard')
+        : redirect()->route('login');
+})->name('welcome');
+
 
 Route::get('/welcome', function () {
     return auth()->check()
