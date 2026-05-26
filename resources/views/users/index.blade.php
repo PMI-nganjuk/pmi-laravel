@@ -102,14 +102,36 @@
                     </x-atoms.input>
 
                     <!-- Password field -->
-                    <x-atoms.input
-                        name="password"
-                        type="password"
-                        x-model="password"
-                        x-bind:label="editingId ? 'Kata Sandi Baru (Kosongkan jika tidak ingin mengubah)' : 'Kata Sandi Sementara'"
-                        x-bind:required="!editingId"
-                        placeholder="Minimal 8 karakter"
-                    />
+                    <div class="w-full">
+                        <label for="password" class="mb-2 block text-xs font-bold uppercase tracking-normal text-content-base">
+                            <span x-text="editingId ? 'Password Baru (Kosongkan jika tidak ingin mengubah)' : 'Password'">Password</span>
+                            <span x-show="!editingId" class="text-danger" aria-hidden="true">*</span>
+                        </label>
+                        <x-atoms.input
+                            name="password"
+                            type="password"
+                            x-model="password"
+                            x-bind:type="showPassword ? 'text' : 'password'"
+                            x-bind:required="!editingId"
+                            placeholder="Minimal 8 karakter"
+                        />
+                        <div class="mt-2 flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    id="toggle-password"
+                                    x-model="showPassword"
+                                    class="h-4 w-4 rounded border-surface-border text-primary focus:ring-primary-ring cursor-pointer"
+                                />
+                                <label for="toggle-password" class="text-xs text-content-muted cursor-pointer select-none">
+                                    Tampilkan Password
+                                </label>
+                            </div>
+                            <p x-show="!editingId" class="text-xs text-content-muted">
+                                Password default: <span class="font-mono bg-surface-muted px-1.5 py-0.5 rounded border border-surface-border text-content-base font-semibold">password</span>
+                            </p>
+                        </div>
+                    </div>
 
                     <!-- Submit Button -->
                     <div class="mt-2 flex flex-col-reverse gap-3 border-t border-surface-border pt-5 sm:flex-row sm:justify-end md:col-span-2">
@@ -255,7 +277,8 @@
                 name: @js(old('name', '')),
                 email: @js(old('email', '')),
                 role: @js(old('role', '')),
-                password: '',
+                password: @js(old('password', '')) || (@js(old('_editing_id', '')) ? '' : 'password'),
+                showPassword: false,
                 storeUrl: @js(route('users.store')),
                 updateBaseUrl: @js(url('dashboard/users')),
                 loadingSubmit: false,
@@ -284,6 +307,7 @@
                     this.email = String(user.email || '');
                     this.role = String(user.role || '');
                     this.password = '';
+                    this.showPassword = false;
                     this.scrollToForm();
                 },
 
@@ -292,7 +316,8 @@
                     this.name = '';
                     this.email = '';
                     this.role = '';
-                    this.password = '';
+                    this.password = 'password';
+                    this.showPassword = false;
                 },
 
                 submitForm() {
