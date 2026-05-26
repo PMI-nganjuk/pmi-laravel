@@ -17,17 +17,6 @@
             <h2 id="coa-form-title" class="mt-1 text-lg font-bold text-content-base" x-text="editingId ? 'Edit Chart of Account' : 'Tambah Chart of Account'"></h2>
             <p class="mt-1 text-sm text-content-muted" x-text="editingId ? 'Perbarui detail akun tanpa mengubah struktur kategori yang tidak diperlukan.' : 'Lengkapi kategori, nama akun, dan posisi laporan untuk menambahkan COA baru.'"></p>
         </div>
-
-        <x-atoms.button
-            type="button"
-            variant="secondary"
-            size="md"
-            x-show="editingId"
-            x-on:click="cancelEdit()"
-            aria-label="Cancel editing chart of account"
-        >
-            Batal Edit
-        </x-atoms.button>
     </div>
 
     <form
@@ -142,6 +131,17 @@
         </x-atoms.input>
 
         <div class="mt-2 flex flex-col-reverse gap-3 border-t border-surface-border pt-5 sm:flex-row sm:justify-end md:col-span-2">
+            <x-atoms.button
+                type="button"
+                variant="secondary"
+                size="md"
+                x-show="editingId"
+                x-on:click="cancelEdit()"
+                aria-label="Cancel editing chart of account"
+            >
+                Batal Edit
+            </x-atoms.button>
+
             <x-atoms.button
                 type="submit"
                 variant="primary"
