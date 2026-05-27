@@ -16,24 +16,19 @@ class ChartOfAccount extends Model
 
     protected $fillable = [
         'id',
-        'category_two',
+        'account_subcategory_id',
         'account_name',
-        'entry_type',
-        'report_type_id',
+        'normal_balance',
+        'financial_report_type_id',
     ];
 
-    public function categoryOne()
+    public function accountSubcategory()
     {
-        return $this->belongsTo(CategoryOne::class, 'category_one', 'category_code');
+        return $this->belongsTo(AccountSubcategory::class, 'account_subcategory_id', 'id');
     }
 
-    public function categoryTwo()
+    public function financialReportType()
     {
-        return $this->belongsTo(CategoryTwo::class, 'category_two', 'category_code');
-    }
-
-    public function reportType()
-    {
-        return $this->belongsTo(ReportTypes::class, 'report_type_id', 'id');
+        return $this->belongsTo(FinancialReportType::class, 'financial_report_type_id', 'id');
     }
 }

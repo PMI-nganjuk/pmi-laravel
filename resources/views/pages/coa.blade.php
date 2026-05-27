@@ -4,15 +4,15 @@
         x-data="createCoaPageComponent({
             storeUrl: @js(route('coa.store')),
             updateBaseUrl: @js(url('/coa')),
-            categoryTwoUrl: @js(route('coa.category-two')),
+            accountSubcategoryUrl: @js(route('coa.account-subcategory')),
             generateCodeUrl: @js(route('coa.generate-code')),
             initialEditingId: @js(old('_editing_id', '')),
-            initialCategoryOne: @js(old('category_one', '')),
-            initialCategoryTwo: @js(old('category_two', '')),
+            initialAccountCategoryId: @js(old('account_category_id', '')),
+            initialAccountSubcategoryId: @js(old('account_subcategory_id', '')),
             initialAccountId: @js(old('id', '')),
             initialAccountName: @js(old('account_name', '')),
-            initialEntryType: @js(old('entry_type', '')),
-            initialReportTypeId: @js(old('report_type_id', '')),
+            initialNormalBalance: @js(old('normal_balance', '')),
+            initialFinancialReportTypeId: @js(old('financial_report_type_id', '')),
         })"
         x-init="init()"
         x-on:click="handlePageClick($event)"
@@ -58,41 +58,41 @@
                 @endif
 
                 <x-organisms.coa-form
-                    :category-one-options="$categoryOneOptions"
-                    :entry-type-options="$entryTypeOptions"
-                    :report-type-options="$reportTypeOptions"
+                    :account-category-options="$accountCategoryOptions"
+                    :normal-balance-options="$normalBalanceOptions"
+                    :financial-report-type-options="$financialReportTypeOptions"
                 />
 
                 <x-organisms.datatable-wrapper
                     :endpoint="route('coa.index')"
                     default-sort="id"
                     default-dir="asc"
-                    :filters="['entry_type' => '', 'report_type_id' => '']"
+                    :filters="['normal_balance' => '', 'financial_report_type_id' => '']"
                 >
                     <x-molecules.datatable-filters placeholder="Cari kode atau nama akun...">
                         
                         <x-atoms.input
                             as="select"
-                            x-model="filters.entry_type"
+                            x-model="filters.normal_balance"
                             x-on:change="fetchData()"
                             class="w-full md:w-64"
                             aria-label="Filter pos saldo"
                         >
                             <option value="">Semua Pos Saldo</option>
-                            @foreach ($entryTypeOptions as $type)
+                            @foreach ($normalBalanceOptions as $type)
                                 <option value="{{ $type->value }}">{{ $type->label() }}</option>
                             @endforeach
                         </x-atoms.input>
 
                         <x-atoms.input
                             as="select"
-                            x-model="filters.report_type_id"
+                            x-model="filters.financial_report_type_id"
                             x-on:change="fetchData()"
                             class="w-full md:w-64"
                             aria-label="Filter pos laporan"
                         >
                             <option value="">Semua Pos Laporan</option>
-                            @foreach ($reportTypeOptions as $id => $name)
+                            @foreach ($financialReportTypeOptions as $id => $name)
                                 <option value="{{ $id }}">{{ $name }}</option>
                             @endforeach
                         </x-atoms.input>
@@ -111,8 +111,8 @@
                                 <x-atoms.table-sort-head column="account_name" label="Nama Akun" />
                                 <x-atoms.table-head>Kategori 1</x-atoms.table-head>
                                 <x-atoms.table-head>Kategori 2</x-atoms.table-head>
-                                <x-atoms.table-sort-head column="entry_type" label="Pos Saldo" />
-                                <x-atoms.table-sort-head column="report_type_id" label="Pos Laporan" />
+                                <x-atoms.table-sort-head column="normal_balance" label="Pos Saldo" />
+                                <x-atoms.table-sort-head column="financial_report_type_id" label="Pos Laporan" />
                                 <x-atoms.table-head class="text-right">Aksi</x-atoms.table-head>
                             </x-slot:headers>
 
@@ -127,21 +127,21 @@
                                     </x-atoms.table-cell>
 
                                     <x-atoms.table-cell>
-                                        {{ $coa->categoryTwo?->categoryOne?->category_name ?? '-' }}
+                                        {{ $coa->accountSubcategory?->accountCategory?->name ?? '-' }}
                                     </x-atoms.table-cell>
 
                                     <x-atoms.table-cell>
-                                        {{ $coa->categoryTwo?->category_name ?? '-' }}
+                                        {{ $coa->accountSubcategory?->name ?? '-' }}
                                     </x-atoms.table-cell>
 
                                     <x-atoms.table-cell>
-                                        <x-atoms.badge :variant="$coa->entry_type === \App\Enums\EntryTypeEnum::DEBIT->value ? 'success' : 'warning'">
-                                            {{ $coa->entry_type === \App\Enums\EntryTypeEnum::DEBIT->value ? 'Debit' : 'Kredit' }}
+                                        <x-atoms.badge :variant="$coa->normal_balance === \App\Enums\EntryTypeEnum::DEBIT->value ? 'success' : 'warning'">
+                                            {{ $coa->normal_balance === \App\Enums\EntryTypeEnum::DEBIT->value ? 'Debit' : 'Kredit' }}
                                         </x-atoms.badge>
                                     </x-atoms.table-cell>
 
                                     <x-atoms.table-cell>
-                                        {{ $coa->reportType?->report_name ?? '-' }}
+                                        {{ $coa->financialReportType?->name ?? '-' }}
                                     </x-atoms.table-cell>
 
                                     <x-atoms.table-cell class="text-right">
@@ -152,11 +152,11 @@
                                                 size="sm"
                                                 data-coa-edit
                                                 data-coa-id="{{ $coa->id }}"
-                                                data-coa-category-one="{{ $coa->categoryTwo?->category_one ?? $coa->category_one }}"
-                                                data-coa-category-two="{{ $coa->category_two }}"
+                                                data-coa-account-category-id="{{ $coa->accountSubcategory?->account_category_id ?? $coa->account_category_id }}"
+                                                data-coa-account-subcategory-id="{{ $coa->account_subcategory_id }}"
                                                 data-coa-account-name="{{ $coa->account_name }}"
-                                                data-coa-entry-type="{{ $coa->entry_type }}"
-                                                data-coa-report-type-id="{{ $coa->report_type_id }}"
+                                                data-coa-normal-balance="{{ $coa->normal_balance }}"
+                                                data-coa-financial-report-type-id="{{ $coa->financial_report_type_id }}"
                                                 :aria-label="'Edit COA ' . $coa->id"
                                             >
                                                 Edit

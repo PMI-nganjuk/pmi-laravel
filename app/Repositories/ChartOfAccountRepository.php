@@ -3,9 +3,9 @@
 namespace App\Repositories;
 
 use App\Models\ChartOfAccount;
-use App\Models\CategoryOne;
-use App\Models\CategoryTwo;
-use App\Models\ReportTypes;
+use App\Models\AccountCategory;
+use App\Models\AccountSubcategory;
+use App\Models\FinancialReportType;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection as SupportCollection;
 
@@ -13,33 +13,33 @@ class ChartOfAccountRepository
 {
     public function getPaginated(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
-        $query = ChartOfAccount::with(['categoryTwo.categoryOne', 'reportType']);
+        $query = ChartOfAccount::with(['accountSubcategory.accountCategory', 'financialReportType']);
 
         if ($search = $filters['search'] ?? null) {
             $query->where(function ($query) use ($search) {
                 $query->where('id', 'like', "%{$search}%")
                     ->orWhere('account_name', 'like', "%{$search}%")
-                    ->orWhereHas('categoryTwo', function ($query) use ($search) {
-                        $query->where('category_name', 'like', "%{$search}%");
+                    ->orWhereHas('accountSubcategory', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%");
                     })
-                    ->orWhereHas('categoryTwo.categoryOne', function ($query) use ($search) {
-                        $query->where('category_name', 'like', "%{$search}%");
+                    ->orWhereHas('accountSubcategory.accountCategory', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%");
                     })
-                    ->orWhereHas('reportType', function ($query) use ($search) {
-                        $query->where('report_name', 'like', "%{$search}%");
+                    ->orWhereHas('financialReportType', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%");
                     });
             });
         }
 
-        if ($entryType = $filters['entry_type'] ?? null) {
-            $query->where('entry_type', $entryType);
+        if ($normalBalance = $filters['normal_balance'] ?? null) {
+            $query->where('normal_balance', $normalBalance);
         }
 
-        if ($reportTypeId = $filters['report_type_id'] ?? null) {
-            $query->where('report_type_id', $reportTypeId);
+        if ($reportTypeId = $filters['financial_report_type_id'] ?? null) {
+            $query->where('financial_report_type_id', $reportTypeId);
         }
 
-        $allowedSorts = ['id', 'account_name', 'entry_type', 'report_type_id', 'created_at'];
+        $allowedSorts = ['id', 'account_name', 'normal_balance', 'financial_report_type_id', 'created_at'];
         $sortBy = in_array($filters['sort_by'] ?? null, $allowedSorts, true) ? $filters['sort_by'] : 'id';
         $sortDir = ($filters['sort_dir'] ?? null) === 'desc' ? 'desc' : 'asc';
 
@@ -66,20 +66,20 @@ class ChartOfAccountRepository
         $chartOfAccount->delete();
     }
 
-    public function getCategoryOneOptions(): SupportCollection
+    public function getAccountCategoryOptions(): SupportCollection
     {
-        return CategoryOne::pluck('category_name', 'category_code');
+        return AccountCategory::pluck('name', 'id');
     }
 
-    public function getCategoryTwoOptions(string $categoryOneCode): SupportCollection
+    public function getAccountSubcategoryOptions(int $accountCategoryId): SupportCollection
     {
-        return CategoryTwo::where('category_one', $categoryOneCode)
-            ->pluck('category_name', 'category_code');
+        return AccountSubcategory::where('account_category_id', $accountCategoryId)
+            ->pluck('name', 'id');
     }
 
-    public function getReportTypeOptions(): SupportCollection
+    public function getFinancialReportTypeOptions(): SupportCollection
     {
-        return ReportTypes::pluck('report_name', 'id');
+        return FinancialReportType::pluck('name', 'id');
     }
 
     public function getLastAccountCodeByPrefix(string $prefix): ?string

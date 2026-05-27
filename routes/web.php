@@ -17,9 +17,9 @@ Route::prefix('coa')
     ->group(function () {
 
         Route::get(
-            '/category-two',
-            [ChartOfAccountController::class, 'getCategoryTwo']
-        )->name('category-two');
+            '/account-subcategory',
+            [ChartOfAccountController::class, 'getAccountSubcategory']
+        )->name('account-subcategory');
 
         Route::get(
             '/generate-code',

@@ -12,19 +12,19 @@ export function createCoaPageComponent(config) {
         // Form state
         storeUrl: config.storeUrl,
         updateBaseUrl: config.updateBaseUrl,
-        categoryTwoUrl: config.categoryTwoUrl,
+        accountSubcategoryUrl: config.accountSubcategoryUrl,
         generateCodeUrl: config.generateCodeUrl,
         editingId: config.initialEditingId || '',
-        categoryOne: config.initialCategoryOne || '',
-        categoryTwo: config.initialCategoryTwo || '',
-        categoryTwoOptions: [],
+        accountCategoryId: config.initialAccountCategoryId || '',
+        accountSubcategoryId: config.initialAccountSubcategoryId || '',
+        accountSubcategoryOptions: [],
         accountId: config.initialAccountId || '',
         accountName: config.initialAccountName || '',
-        entryType: config.initialEntryType || '',
-        reportTypeId: config.initialReportTypeId || '',
+        normalBalance: config.initialNormalBalance || '',
+        financialReportTypeId: config.initialFinancialReportTypeId || '',
 
         // UI state
-        loadingCategoryTwo: false,
+        loadingAccountSubcategory: false,
         loadingCode: false,
         loadingSubmit: false,
 
@@ -35,19 +35,19 @@ export function createCoaPageComponent(config) {
                 : this.storeUrl;
         },
 
-        get categoryTwoPlaceholder() {
-            if (!this.categoryOne) {
+        get accountSubcategoryPlaceholder() {
+            if (!this.accountCategoryId) {
                 return 'Pilih kategori utama dulu';
             }
-            return this.loadingCategoryTwo ? 'Memuat kategori 2...' : 'Pilih kategori 2';
+            return this.loadingAccountSubcategory ? 'Memuat kategori 2...' : 'Pilih kategori 2';
         },
 
         // Initialization
         async init() {
-            if (this.categoryOne) {
-                await this.loadCategoryTwoOptions();
+            if (this.accountCategoryId) {
+                await this.loadAccountSubcategoryOptions();
 
-                if (this.categoryTwo && !this.accountId) {
+                if (this.accountSubcategoryId && !this.accountId) {
                     await this.updateCode();
                 }
             }
@@ -65,11 +65,11 @@ export function createCoaPageComponent(config) {
 
             this.editCoa({
                 id: editButton.dataset.coaId,
-                category_one: editButton.dataset.coaCategoryOne,
-                category_two: editButton.dataset.coaCategoryTwo,
+                account_category_id: editButton.dataset.coaAccountCategoryId,
+                account_subcategory_id: editButton.dataset.coaAccountSubcategoryId,
                 account_name: editButton.dataset.coaAccountName,
-                entry_type: editButton.dataset.coaEntryType,
-                report_type_id: editButton.dataset.coaReportTypeId,
+                normal_balance: editButton.dataset.coaNormalBalance,
+                financial_report_type_id: editButton.dataset.coaFinancialReportTypeId,
             });
         },
 
@@ -104,13 +104,13 @@ export function createCoaPageComponent(config) {
 
         cancelEdit(keepOpen = true) {
             this.editingId = '';
-            this.categoryOne = '';
-            this.categoryTwo = '';
-            this.categoryTwoOptions = [];
+            this.accountCategoryId = '';
+            this.accountSubcategoryId = '';
+            this.accountSubcategoryOptions = [];
             this.accountId = '';
             this.accountName = '';
-            this.entryType = '';
-            this.reportTypeId = '';
+            this.normalBalance = '';
+            this.financialReportTypeId = '';
             this.loadingSubmit = false;
             this.showForm = keepOpen ? true : this.showForm;
         },
@@ -119,42 +119,42 @@ export function createCoaPageComponent(config) {
         async editCoa(record) {
             this.showForm = true;
             this.editingId = String(record.id || '');
-            this.categoryOne = String(record.category_one || '');
-            this.categoryTwo = '';
+            this.accountCategoryId = String(record.account_category_id || '');
+            this.accountSubcategoryId = '';
             this.accountId = String(record.id || '');
             this.accountName = String(record.account_name || '');
-            this.entryType = String(record.entry_type || '');
-            this.reportTypeId = String(record.report_type_id || '');
+            this.normalBalance = String(record.normal_balance || '');
+            this.financialReportTypeId = String(record.financial_report_type_id || '');
 
-            await this.loadCategoryTwoOptions();
-            this.categoryTwo = String(record.category_two || '');
+            await this.loadAccountSubcategoryOptions();
+            this.accountSubcategoryId = String(record.account_subcategory_id || '');
             this.scrollToForm();
         },
 
         // Form field event handlers
-        async handleCategoryOneChange() {
-            this.categoryTwo = '';
+        async handleAccountCategoryChange() {
+            this.accountSubcategoryId = '';
             this.accountId = '';
-            await this.loadCategoryTwoOptions();
+            await this.loadAccountSubcategoryOptions();
         },
 
-        async handleCategoryTwoChange() {
+        async handleAccountSubcategoryChange() {
             await this.updateCode();
         },
 
         // Data fetching
-        async loadCategoryTwoOptions() {
-            this.categoryTwoOptions = [];
+        async loadAccountSubcategoryOptions() {
+            this.accountSubcategoryOptions = [];
 
-            if (!this.categoryOne) {
+            if (!this.accountCategoryId) {
                 return;
             }
 
-            this.loadingCategoryTwo = true;
+            this.loadingAccountSubcategory = true;
 
             try {
-                const params = new URLSearchParams({ category_one: this.categoryOne });
-                const response = await fetch(`${this.categoryTwoUrl}?${params.toString()}`, {
+                const params = new URLSearchParams({ account_category_id: this.accountCategoryId });
+                const response = await fetch(`${this.accountSubcategoryUrl}?${params.toString()}`, {
                     headers: { Accept: 'application/json' },
                 });
 
@@ -163,19 +163,19 @@ export function createCoaPageComponent(config) {
                 }
 
                 const payload = await response.json();
-                this.categoryTwoOptions = Object.entries(payload.data || {}).map(([code, name]) => ({ code, name }));
+                this.accountSubcategoryOptions = Object.entries(payload.data || {}).map(([id, name]) => ({ id, name }));
             } catch (error) {
                 console.error(error);
-                this.categoryTwoOptions = [];
+                this.accountSubcategoryOptions = [];
             } finally {
-                this.loadingCategoryTwo = false;
+                this.loadingAccountSubcategory = false;
             }
         },
 
         async updateCode() {
             this.accountId = '';
 
-            if (!this.categoryOne || !this.categoryTwo) {
+            if (!this.accountCategoryId || !this.accountSubcategoryId) {
                 return;
             }
 
@@ -183,8 +183,8 @@ export function createCoaPageComponent(config) {
 
             try {
                 const params = new URLSearchParams({
-                    category_one: this.categoryOne,
-                    category_two: this.categoryTwo,
+                    account_category_id: this.accountCategoryId,
+                    account_subcategory_id: this.accountSubcategoryId,
                 });
                 const response = await fetch(`${this.generateCodeUrl}?${params.toString()}`, {
                     headers: { Accept: 'application/json' },
@@ -223,4 +223,3 @@ export function createCoaPageComponent(config) {
         },
     };
 }
-

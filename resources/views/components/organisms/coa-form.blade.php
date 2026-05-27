@@ -1,7 +1,7 @@
 @props([
-    'categoryOneOptions' => [],
-    'entryTypeOptions' => [],
-    'reportTypeOptions' => [],
+    'accountCategoryOptions' => [],
+    'normalBalanceOptions' => [],
+    'financialReportTypeOptions' => [],
 ])
 
 <x-atoms.surface
@@ -36,39 +36,39 @@
 
         <x-atoms.input
             as="select"
-            name="category_one"
+            name="account_category_id"
             label="Kategori 1"
-            x-model="categoryOne"
-            x-on:change="handleCategoryOneChange()"
+            x-model="accountCategoryId"
+            x-on:change="handleAccountCategoryChange()"
             required
             aria-label="Select primary category"
         >
             <option value="">Pilih kategori utama</option>
-            @foreach ($categoryOneOptions as $code => $name)
-                <option value="{{ $code }}">{{ $code }} - {{ $name }}</option>
+            @foreach ($accountCategoryOptions as $id => $name)
+                <option value="{{ $id }}">{{ $id }} - {{ $name }}</option>
             @endforeach
         </x-atoms.input>
 
         <div>
             <x-atoms.input
                 as="select"
-                name="category_two"
+                name="account_subcategory_id"
                 label="Kategori 2"
-                x-model="categoryTwo"
-                x-on:change="handleCategoryTwoChange()"
-                x-bind:disabled="!categoryOne || loadingCategoryTwo"
+                x-model="accountSubcategoryId"
+                x-on:change="handleAccountSubcategoryChange()"
+                x-bind:disabled="!accountCategoryId || loadingAccountSubcategory"
                 required
                 aria-label="Select secondary category"
-                aria-busy="loadingCategoryTwo"
+                aria-busy="loadingAccountSubcategory"
             >
-                <option value="" x-text="categoryTwoPlaceholder"></option>
-                <template x-for="option in categoryTwoOptions" :key="option.code">
-                    <option :value="option.code" x-text="`${option.code} - ${option.name}`"></option>
+                <option value="" x-text="accountSubcategoryPlaceholder"></option>
+                <template x-for="option in accountSubcategoryOptions" :key="option.id">
+                    <option :value="option.id" x-text="`${option.id} - ${option.name}`"></option>
                 </template>
             </x-atoms.input>
 
             <p
-                x-show="categoryOne && !loadingCategoryTwo && categoryTwoOptions.length === 0"
+                x-show="accountCategoryId && !loadingAccountSubcategory && accountSubcategoryOptions.length === 0"
                 x-cloak
                 class="mt-1.5 text-xs font-medium text-danger-text"
                 role="alert"
@@ -115,16 +115,16 @@
             />
         </div>
 
-        <x-atoms.input as="select" name="entry_type" label="Pos Saldo" x-model="entryType" required aria-label="Select balance position">
+        <x-atoms.input as="select" name="normal_balance" label="Pos Saldo" x-model="normalBalance" required aria-label="Select balance position">
             <option value="">Pilih posisi saldo</option>
-            @foreach ($entryTypeOptions as $type)
+            @foreach ($normalBalanceOptions as $type)
                 <option value="{{ $type->value }}">{{ $type->label() }}</option>
             @endforeach
         </x-atoms.input>
 
-        <x-atoms.input as="select" name="report_type_id" label="Pos Laporan" x-model="reportTypeId" required aria-label="Select report position">
+        <x-atoms.input as="select" name="financial_report_type_id" label="Pos Laporan" x-model="financialReportTypeId" required aria-label="Select report position">
             <option value="">Pilih laporan terkait</option>
-            @foreach ($reportTypeOptions as $id => $name)
+            @foreach ($financialReportTypeOptions as $id => $name)
                 <option value="{{ $id }}">{{ $name }}</option>
             @endforeach
         </x-atoms.input>

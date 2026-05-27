@@ -21,8 +21,8 @@ class StoreChartOfAccountRequest extends FormRequest
             : $currentAccount;
 
         return [
-            'category_one'   => 'required|string',
-            'category_two'   => 'required|string',
+            'account_category_id'   => 'required|integer|exists:account_categories,id',
+            'account_subcategory_id'   => 'required|integer|exists:account_subcategories,id',
             'id'             => [
                 'required',
                 'string',
@@ -30,8 +30,8 @@ class StoreChartOfAccountRequest extends FormRequest
                 Rule::unique('chart_of_accounts', 'id')->ignore($currentId, 'id'),
             ],
             'account_name'   => 'required|string|max:100',
-            'entry_type'     => 'required|string',
-            'report_type_id' => 'required|exists:report_types,id',
+            'normal_balance'     => 'required|string',
+            'financial_report_type_id' => 'required|exists:financial_report_types,id',
         ];
     }
 }
