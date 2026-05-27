@@ -113,7 +113,7 @@
                                 <x-atoms.table-head>Kategori 2</x-atoms.table-head>
                                 <x-atoms.table-sort-head column="normal_balance" label="Pos Saldo" />
                                 <x-atoms.table-sort-head column="financial_report_type_id" label="Pos Laporan" />
-                                <x-atoms.table-head class="text-right">Aksi</x-atoms.table-head>
+                                <x-atoms.table-head class="text-center">Aksi</x-atoms.table-head>
                             </x-slot:headers>
 
                             @foreach ($coas as $coa)

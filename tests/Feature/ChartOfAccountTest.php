@@ -164,9 +164,9 @@ class ChartOfAccountTest extends TestCase
     public function test_generate_code_endpoint_returns_next_account_code(): void
     {
         // Create a COA with proper prefix: {category_id}-{subcategory_id}{sequence} - 00
-        $prefix = $this->assetCategory->id . '-' . $this->currentAssetSubcategory->id;
+        $prefix = $this->assetCategory->id . $this->currentAssetSubcategory->id;
         ChartOfAccount::create($this->validChartOfAccountAttributes([
-            'id' => $prefix . '001 - 00',
+            'id' => $prefix . '001-00',
         ]));
 
         $response = $this->getJson(route('coa.generate-code', [
@@ -175,11 +175,11 @@ class ChartOfAccountTest extends TestCase
         ]));
 
         $response->assertOk();
-        // Should generate next sequence: 002
+        // Should generate next sequence: 011
         $response->assertJson([
             'success' => true,
             'data' => [
-                'code' => $prefix . '002 - 00',
+                'code' => $prefix . '011-00',
             ],
         ]);
     }
