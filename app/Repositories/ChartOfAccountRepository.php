@@ -8,6 +8,7 @@ use App\Models\AccountSubcategory;
 use App\Models\FinancialReportType;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Support\Facades\Cache;
 
 class ChartOfAccountRepository
 {
@@ -51,19 +52,30 @@ class ChartOfAccountRepository
 
     public function create(array $attributes): ChartOfAccount
     {
-        return ChartOfAccount::create($attributes);
+        $coa = ChartOfAccount::create($attributes);
+        $this->clearCache();
+        return $coa;
     }
 
     public function update(ChartOfAccount $chartOfAccount, array $attributes): ChartOfAccount
     {
         $chartOfAccount->update($attributes);
-
+        $this->clearCache();
         return $chartOfAccount;
     }
 
     public function delete(ChartOfAccount $chartOfAccount): void
     {
         $chartOfAccount->delete();
+        $this->clearCache();
+    }
+
+    protected function clearCache(): void
+    {
+        Cache::store('array')->forget('coa.cash_accounts');
+        Cache::store('array')->forget('coa.transaction_accounts');
+        Cache::forget('coa.cash_accounts');
+        Cache::forget('coa.transaction_accounts');
     }
 
     public function getAccountCategoryOptions(): SupportCollection
@@ -87,5 +99,30 @@ class ChartOfAccountRepository
         return ChartOfAccount::where('id', 'like', $prefix . '%')
             ->orderByDesc('id')
             ->value('id');
+    }
+
+    public function getCashAccounts(): SupportCollection
+    {
+        return Cache::store('array')->remember(
+            'coa.cash_accounts',
+            now()->addHour(),
+            fn () => ChartOfAccount::with('accountSubcategory')
+                ->whereHas('accountSubcategory', function ($q) {
+                    $q->where('id', '<=', 2)
+                      ->where('account_category_id', 1);
+                })
+                ->orderBy('id')
+                ->get(['id', 'account_name'])
+        );
+    }
+
+    public function getTransactionAccounts(): SupportCollection
+    {
+        return Cache::store('array')->remember(
+            'coa.transaction_accounts',
+            now()->addHour(),
+            fn () => ChartOfAccount::orderBy('id')
+                ->get(['id', 'account_name'])
+        );
     }
 }

@@ -134,7 +134,7 @@
             cancelShow="editingId"
             cancelClick="cancelEdit()"
             loadingShow="loadingSubmit"
-            submitDisabled="loadingSubmit || loadingCategoryTwo || loadingCode"
+            submitDisabled="loadingSubmit || loadingAccountSubcategory || loadingCode"
             submitBusy="loadingSubmit"
             submitXText="editingId ? 'Simpan Perubahan' : 'Simpan COA'"
             cancelAriaLabel="Cancel editing chart of account"

@@ -67,6 +67,12 @@ class Sidebar extends Component
                 'active'=> request()->routeIs('finance.reports')
             ];
             $menu[] = [
+                'label' => 'Penerimaan Kas',
+                'route' => 'receipts.index',
+                'icon'  => 'money-add',
+                'active'=> request()->routeIs('receipts.*')
+            ];
+            $menu[] = [
                 'label' => 'Chart of Accounts',
                 'route' => 'coa.index',
                 'icon'  => 'book',

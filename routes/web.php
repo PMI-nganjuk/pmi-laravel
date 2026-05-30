@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CashReceiptController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -8,6 +9,25 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\SettingController;
+
+
+// Finance: Cash Receipts (Penerimaan Kas)
+Route::middleware(['auth', 'can:finance.view'])
+    ->prefix('receipts')
+    ->name('receipts.')
+    ->group(function () {
+        Route::get('/', [CashReceiptController::class, 'index'])->name('index');
+        Route::post('/', [CashReceiptController::class, 'store'])
+            ->middleware('can:finance.create')->name('store');
+        Route::put('/{transaction}', [CashReceiptController::class, 'update'])
+            ->middleware('can:finance.create')->name('update');
+        Route::delete('/{transaction}', [CashReceiptController::class, 'destroy'])
+            ->middleware('can:finance.create')->name('destroy');
+        Route::get('/cash-accounts', [CashReceiptController::class, 'getCashAccounts'])->name('cash-accounts');
+        Route::get('/transaction-accounts', [CashReceiptController::class, 'getTransactionAccounts'])->name('transaction-accounts');
+        Route::get('/suggest-description', [CashReceiptController::class, 'suggestDescription'])->name('suggest-description');
+    });
+
 
 Route::resource('coa', ChartOfAccountController::class)->except(['show', 'edit']);
 Route::resource('programs', ProgramController::class)->except(['show', 'edit'])->middleware('auth');

@@ -9,6 +9,7 @@ use App\Models\AccountSubcategory;
 use App\Models\ChartOfAccount;
 use App\Models\FinancialReportType;
 use App\Models\User;
+use App\Repositories\ChartOfAccountRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -163,7 +164,6 @@ class ChartOfAccountTest extends TestCase
 
     public function test_generate_code_endpoint_returns_next_account_code(): void
     {
-        // Create a COA with proper prefix: {category_id}-{subcategory_id}{sequence} - 00
         $prefix = $this->assetCategory->id . $this->currentAssetSubcategory->id;
         ChartOfAccount::create($this->validChartOfAccountAttributes([
             'id' => $prefix . '001-00',
@@ -175,7 +175,6 @@ class ChartOfAccountTest extends TestCase
         ]));
 
         $response->assertOk();
-        // Should generate next sequence: 011
         $response->assertJson([
             'success' => true,
             'data' => [
@@ -201,6 +200,23 @@ class ChartOfAccountTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Kas Operasional');
+    }
+
+    public function test_updating_chart_of_account_clears_cached_accounts(): void
+    {
+        $repo = app(ChartOfAccountRepository::class);
+
+        $initialCount = $repo->getCashAccounts()->count();
+
+        $repo->create($this->validChartOfAccountAttributes([
+            'id' => '111002 - 00',
+            'account_name' => 'Kas Tambahan Baru',
+        ]));
+
+        $updatedCashAccounts = $repo->getCashAccounts();
+
+        $this->assertEquals($initialCount + 1, $updatedCashAccounts->count());
+        $this->assertTrue($updatedCashAccounts->contains('account_name', 'Kas Tambahan Baru'));
     }
 
     private function validFormPayload(array $overrides = []): array

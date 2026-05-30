@@ -2,6 +2,7 @@
 
 namespace App\View\Components\Layout;
 
+use App\Services\OrganizationProfileService;
 use Illuminate\View\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -9,10 +10,21 @@ use Illuminate\Support\Facades\Route;
 class Header extends Component
 {
     public string $pageTitle;
+    public ?string $financialPeriod = null;
 
     public function __construct(?string $pageTitle = null)
     {
         $this->pageTitle = $pageTitle ?? $this->resolveTitleFromRoute();
+
+        try {
+            $profileService = app(OrganizationProfileService::class);
+            $profile = $profileService->getProfile();
+            if ($profile && $profile->financial_period_start && $profile->financial_period_end) {
+                $this->financialPeriod = $profile->financial_period_start->format('d/m/Y') . ' s.d ' . $profile->financial_period_end->format('d/m/Y');
+            }
+        } catch (\Throwable $e) {
+            $this->financialPeriod = null;
+        }
     }
 
     public function render()
@@ -32,6 +44,7 @@ class Header extends Component
             'users.index' => 'Manajemen Akun',
             'finance.journal' => 'Jurnal Keuangan',
             'coa.index' => 'Daftar Chart of Accounts',
+            'receipts.index' => 'Penerimaan Kas',
             default => 'Dasbor Utama',
         };
     }
