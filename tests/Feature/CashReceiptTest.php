@@ -13,6 +13,7 @@ use App\Models\Program;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class CashReceiptTest extends TestCase
@@ -26,9 +27,17 @@ class CashReceiptTest extends TestCase
     private AccountCategory  $assetCategory;
     private AccountSubcategory $cashSubcategory;
 
+    protected function tearDown(): void
+    {
+        Cache::store('array')->flush();
+        parent::tearDown();
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
+
+        Cache::store('array')->flush();
 
         $reportType = FinancialReportType::create(['name' => 'Neraca']);
 

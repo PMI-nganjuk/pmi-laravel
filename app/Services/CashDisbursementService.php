@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Data\CashReceiptData;
+use App\Data\CashDisbursementData;
 use App\Enums\TransactionTypeEnum;
 use App\Models\ChartOfAccount;
 use App\Models\Transaction;
@@ -13,7 +13,7 @@ use App\Repositories\GeneralLedgerRepository;
 use App\Repositories\TransactionRepository;
 use Illuminate\Support\Facades\DB;
 
-class CashReceiptService
+class CashDisbursementService
 {
     public function __construct(
         protected TransactionRepository    $transactionRepository,
@@ -29,40 +29,44 @@ class CashReceiptService
             'transactionAccounts' => $this->coaRepository->getTransactionAccounts(),
             'programs'            => Program::all(),
             'users'               => User::all(),
-            'nextDocumentNumber'  => $this->documentNumberService->generate(TransactionTypeEnum::INCOME),
-            'receipts'            => $this->transactionRepository->getPaginated(TransactionTypeEnum::INCOME, $filters),
+            'nextDocumentNumber'  => $this->documentNumberService->generate(TransactionTypeEnum::EXPENSE),
+            'disbursements'       => $this->transactionRepository->getPaginated(TransactionTypeEnum::EXPENSE, $filters),
         ];
     }
 
-    public function store(CashReceiptData $data): Transaction
+    public function store(CashDisbursementData $data): Transaction
     {
         return DB::transaction(function () use ($data) {
-            $documentNumber = $data->documentNumber ?: $this->documentNumberService->generate(TransactionTypeEnum::INCOME);
+            $documentNumber = $data->documentNumber
+                ?: $this->documentNumberService->generate(TransactionTypeEnum::EXPENSE);
 
             $transaction = $this->transactionRepository->create([
                 'transaction_date' => $data->transactionDate,
                 'document_number'  => $documentNumber,
-                'transaction_type' => TransactionTypeEnum::INCOME->value,
+                'transaction_type' => TransactionTypeEnum::EXPENSE->value,
                 'program_id'       => $data->programId,
                 'user_id'          => $data->userId,
                 'reference'        => $data->reference,
                 'description'      => $data->description,
             ]);
 
+            // GL Double-Entry (inverted from receipt):
+            // Debit  → Kode Transaksi (beban/hutang yang bertambah)
+            // Credit → Rekening Kas   (kas/bank yang berkurang)
             $this->generalLedgerRepository->createMany([
                 [
                     'transaction_id'      => $transaction->id,
-                    'chart_of_account_id' => $data->cashAccountCode,
+                    'chart_of_account_id' => $data->transactionAccountCode,
                     'debit'               => $data->amount,
                     'credit'              => 0,
-                    'note'                => 'Penerimaan kas',
+                    'note'                => 'Kode transaksi pengeluaran',
                 ],
                 [
                     'transaction_id'      => $transaction->id,
-                    'chart_of_account_id' => $data->transactionAccountCode,
+                    'chart_of_account_id' => $data->cashAccountCode,
                     'debit'               => 0,
                     'credit'              => $data->amount,
-                    'note'                => 'Kode transaksi',
+                    'note'                => 'Pengeluaran kas',
                 ],
             ]);
 
@@ -70,40 +74,7 @@ class CashReceiptService
         });
     }
 
-    public function suggestDescription(string $transactionAccountCode): ?string
-    {
-        $coa = ChartOfAccount::with('accountSubcategory.accountCategory')
-            ->find($transactionAccountCode);
-
-        if ($coa === null) {
-            return null;
-        }
-
-        $accountName   = $coa->account_name;
-        $subcategoryId = $coa->accountSubcategory?->id;
-        $categoryId    = $coa->accountSubcategory?->accountCategory?->id;
-
-        $month = now()->translatedFormat('F');
-        $year  = now()->year;
-
-        return match (true) {
-            $accountName === 'Penghasilan Lainnya'
-                => "Penerimaan Bunga Bank {$month} {$year}",
-
-            $subcategoryId === 2 && $categoryId === 1
-                => 'Penarikan Uang Tunai Dari Bank ',
-
-            $accountName === 'Pendapatan Netto Tidak Terikat Periode Berjalan'
-                => 'Penerimaan BPPD Kuitansi No. ',
-
-            $subcategoryId === 3 && $categoryId === 1
-                => "Pembayaran Piutang {$accountName} {$month} {$year}",
-
-            default => '',
-        };
-    }
-
-    public function update(Transaction $transaction, CashReceiptData $data): Transaction
+    public function update(Transaction $transaction, CashDisbursementData $data): Transaction
     {
         return DB::transaction(function () use ($transaction, $data) {
             $transaction->update([
@@ -120,17 +91,17 @@ class CashReceiptService
             $this->generalLedgerRepository->createMany([
                 [
                     'transaction_id'      => $transaction->id,
-                    'chart_of_account_id' => $data->cashAccountCode,
+                    'chart_of_account_id' => $data->transactionAccountCode,
                     'debit'               => $data->amount,
                     'credit'              => 0,
-                    'note'                => 'Penerimaan kas',
+                    'note'                => 'Kode transaksi pengeluaran',
                 ],
                 [
                     'transaction_id'      => $transaction->id,
-                    'chart_of_account_id' => $data->transactionAccountCode,
+                    'chart_of_account_id' => $data->cashAccountCode,
                     'debit'               => 0,
                     'credit'              => $data->amount,
-                    'note'                => 'Kode transaksi',
+                    'note'                => 'Pengeluaran kas',
                 ],
             ]);
 
@@ -144,5 +115,51 @@ class CashReceiptService
             $transaction->generalLedgers()->delete();
             $transaction->delete();
         });
+    }
+
+    /**
+     * Suggest a description based on keyword matching in the transaction account name.
+     *
+     * Rules (keyword → suggestion):
+     * - "Hutang"                → "Pembayaran Hutang {NamaAkun}"
+     * - "Tunjangan"             → "Pembayaran Manajemen Organisasi {Bulan} {Tahun}"
+     * - "BPJS"                  → "Pembayaran BPJS {Bulan} {Tahun}"
+     * - "Gaji"                  → "Pembayaran Gaji {Bulan} {Tahun}"
+     * - "Insentif"              → "Pembayaran Jasa {Bulan} {Tahun}"
+     * - "Internet, Listrik dan Air" → "Pembayaran Rekening {Bulan} {Tahun}"
+     */
+    public function suggestDescription(string $transactionAccountCode): ?string
+    {
+        $coa = ChartOfAccount::find($transactionAccountCode);
+
+        if ($coa === null) {
+            return null;
+        }
+
+        $accountName = $coa->account_name;
+        $month       = now()->translatedFormat('F');
+        $year        = now()->year;
+
+        return match (true) {
+            str_contains($accountName, 'Internet, Listrik dan Air')
+                => "Pembayaran Rekening {$month} {$year}",
+
+            str_contains($accountName, 'Hutang')
+                => "Pembayaran Hutang {$accountName}",
+
+            str_contains($accountName, 'Tunjangan')
+                => "Pembayaran Manajemen Organisasi {$month} {$year}",
+
+            str_contains($accountName, 'BPJS')
+                => "Pembayaran BPJS {$month} {$year}",
+
+            str_contains($accountName, 'Gaji')
+                => "Pembayaran Gaji {$month} {$year}",
+
+            str_contains($accountName, 'Insentif')
+                => "Pembayaran Jasa {$month} {$year}",
+
+            default => '',
+        };
     }
 }

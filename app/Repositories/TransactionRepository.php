@@ -25,10 +25,19 @@ class TransactionRepository
             ->value('document_number');
     }
 
-    public function getPaginated(array $filters = [], int $perPage = 15): LengthAwarePaginator
-    {
-        $query = Transaction::with(['program', 'user', 'generalLedgers'])
-            ->where('transaction_type', TransactionTypeEnum::INCOME);
+    /**
+     * Retrieve paginated transactions for a given type with optional filters.
+     * Applies financial period filter at database level for performance.
+     * Supports global search across document_number, description, reference,
+     * program name, user name, COA name, and numeric amount fields.
+     */
+    public function getPaginated(
+        TransactionTypeEnum $type,
+        array $filters = [],
+        int $perPage = 15,
+    ): LengthAwarePaginator {
+        $query = Transaction::with(['program', 'user', 'generalLedgers.chartOfAccount'])
+            ->where('transaction_type', $type->value);
 
         try {
             $profile = app(OrganizationProfileService::class)->getProfile();

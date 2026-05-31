@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CashDisbursementController;
 use App\Http\Controllers\CashReceiptController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -26,6 +27,24 @@ Route::middleware(['auth', 'can:finance.view'])
         Route::get('/cash-accounts', [CashReceiptController::class, 'getCashAccounts'])->name('cash-accounts');
         Route::get('/transaction-accounts', [CashReceiptController::class, 'getTransactionAccounts'])->name('transaction-accounts');
         Route::get('/suggest-description', [CashReceiptController::class, 'suggestDescription'])->name('suggest-description');
+    });
+
+
+// Finance: Cash Disbursements (Pengeluaran Kas)
+Route::middleware(['auth', 'can:finance.view'])
+    ->prefix('disbursements')
+    ->name('disbursements.')
+    ->group(function () {
+        Route::get('/', [CashDisbursementController::class, 'index'])->name('index');
+        Route::post('/', [CashDisbursementController::class, 'store'])
+            ->middleware('can:finance.create')->name('store');
+        Route::put('/{transaction}', [CashDisbursementController::class, 'update'])
+            ->middleware('can:finance.create')->name('update');
+        Route::delete('/{transaction}', [CashDisbursementController::class, 'destroy'])
+            ->middleware('can:finance.create')->name('destroy');
+        Route::get('/cash-accounts', [CashDisbursementController::class, 'getCashAccounts'])->name('cash-accounts');
+        Route::get('/transaction-accounts', [CashDisbursementController::class, 'getTransactionAccounts'])->name('transaction-accounts');
+        Route::get('/suggest-description', [CashDisbursementController::class, 'suggestDescription'])->name('suggest-description');
     });
 
 
