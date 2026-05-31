@@ -101,7 +101,7 @@ class ChartOfAccountRepository
 
     public function getCashAccounts(): SupportCollection
     {
-        return Cache::remember(
+        $raw = Cache::remember(
             'coa.cash_accounts',
             now()->addHour(),
             fn () => ChartOfAccount::with('accountSubcategory')
@@ -111,16 +111,24 @@ class ChartOfAccountRepository
                 })
                 ->orderBy('id')
                 ->get(['id', 'account_name'])
+                ->map(fn($coa) => $coa->getAttributes())
+                ->toArray()
         );
+
+        return ChartOfAccount::hydrate($raw);
     }
 
     public function getTransactionAccounts(): SupportCollection
     {
-        return Cache::remember(
+        $raw = Cache::remember(
             'coa.transaction_accounts',
             now()->addHour(),
             fn () => ChartOfAccount::orderBy('id')
                 ->get(['id', 'account_name'])
+                ->map(fn($coa) => $coa->getAttributes())
+                ->toArray()
         );
+
+        return ChartOfAccount::hydrate($raw);
     }
 }

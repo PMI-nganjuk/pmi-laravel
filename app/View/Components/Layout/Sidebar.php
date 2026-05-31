@@ -79,6 +79,12 @@ class Sidebar extends Component
                 'active'=> request()->routeIs('disbursements.*')
             ];
             $menu[] = [
+                'label' => 'Jurnal Penyesuaian',
+                'route' => 'adjusting-entries.index',
+                'icon'  => 'money-add',
+                'active'=> request()->routeIs('adjusting-entries.*')
+            ];
+            $menu[] = [
                 'label' => 'Chart of Accounts',
                 'route' => 'coa.index',
                 'icon'  => 'book',

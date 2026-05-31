@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\AdjustingEntryController;
 
 
 // Finance: Cash Receipts (Penerimaan Kas)
@@ -45,6 +46,21 @@ Route::middleware(['auth', 'can:finance.view'])
         Route::get('/cash-accounts', [CashDisbursementController::class, 'getCashAccounts'])->name('cash-accounts');
         Route::get('/transaction-accounts', [CashDisbursementController::class, 'getTransactionAccounts'])->name('transaction-accounts');
         Route::get('/suggest-description', [CashDisbursementController::class, 'suggestDescription'])->name('suggest-description');
+    });
+
+
+// Finance: Adjusting Entries (Jurnal Penyesuaian)
+Route::middleware(['auth', 'can:finance.view'])
+    ->prefix('adjusting-entries')
+    ->name('adjusting-entries.')
+    ->group(function () {
+        Route::get('/', [AdjustingEntryController::class, 'index'])->name('index');
+        Route::post('/', [AdjustingEntryController::class, 'store'])
+            ->middleware('can:finance.create')->name('store');
+        Route::put('/{transaction}', [AdjustingEntryController::class, 'update'])
+            ->middleware('can:finance.create')->name('update');
+        Route::delete('/{transaction}', [AdjustingEntryController::class, 'destroy'])
+            ->middleware('can:finance.create')->name('destroy');
     });
 
 

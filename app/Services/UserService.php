@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Enums\RoleEnum;
 use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -33,7 +34,9 @@ class UserService
     {
         return DB::transaction(function () use ($data) {
             $data['password'] = Hash::make($data['password']);
-            return $this->repository->create($data);
+            $user = $this->repository->create($data);
+            Cache::forget('users.all');
+            return $user;
         });
     }
 
@@ -48,7 +51,9 @@ class UserService
             } else {
                 unset($data['password']);
             }
-            return $this->repository->update($user, $data);
+            $updated = $this->repository->update($user, $data);
+            Cache::forget('users.all');
+            return $updated;
         });
     }
 
@@ -65,6 +70,7 @@ class UserService
 
         DB::transaction(function () use ($user) {
             $this->repository->delete($user);
+            Cache::forget('users.all');
         });
     }
 }

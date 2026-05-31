@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\TransactionTypeEnum;
+use App\Rules\ActiveFinancialPeriod;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -31,7 +32,11 @@ class StoreCashReceiptRequest extends FormRequest
         $transactionId = $this->route('transaction')?->id;
 
         return [
-            'transaction_date'        => ['required', 'date'],
+            'transaction_date'        => [
+                'required',
+                'date',
+                new ActiveFinancialPeriod()
+            ],
             'cash_account_code'       => ['required', 'string', 'exists:chart_of_accounts,id'],
             'transaction_account_code'=> ['required', 'string', 'exists:chart_of_accounts,id'],
             'amount'                  => ['required', 'numeric', 'min:1'],

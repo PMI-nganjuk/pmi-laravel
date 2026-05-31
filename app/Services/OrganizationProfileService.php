@@ -18,9 +18,11 @@ class OrganizationProfileService
      */
     public function getProfile(): OrganizationProfile
     {
-        return Cache::remember('organization.profile', now()->addHour(), function () {
-            return $this->repository->firstOrCreate();
+        $raw = Cache::remember('organization.profile', now()->addHour(), function () {
+            return $this->repository->firstOrCreate()->getAttributes();
         });
+
+        return (new OrganizationProfile)->newFromBuilder($raw);
     }
 
     /**

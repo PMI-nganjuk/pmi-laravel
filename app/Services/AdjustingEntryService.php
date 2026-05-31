@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Data\CashReceiptData;
+use App\Data\AdjustingEntryData;
 use App\Enums\TransactionTypeEnum;
-use App\Models\ChartOfAccount;
+use App\Enums\JournalEntryTypeEnum;
 use App\Models\Transaction;
 use App\Models\Program;
 use App\Models\User;
@@ -14,7 +14,7 @@ use App\Repositories\TransactionRepository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
-class CashReceiptService
+class AdjustingEntryService
 {
     public function __construct(
         protected TransactionRepository    $transactionRepository,
@@ -38,44 +38,53 @@ class CashReceiptService
         );
 
         return [
-            'cashAccounts'        => $this->coaRepository->getCashAccounts(),
-            'transactionAccounts' => $this->coaRepository->getTransactionAccounts(),
-            'programs'            => Program::hydrate($programsRaw),
-            'users'               => User::hydrate($usersRaw),
-            'nextDocumentNumber'  => $this->documentNumberService->generate(TransactionTypeEnum::INCOME),
-            'receipts'            => $this->transactionRepository->getPaginated(TransactionTypeEnum::INCOME, $filters),
+            'allAccounts'        => $this->coaRepository->getTransactionAccounts(),
+            'programs'           => Program::hydrate($programsRaw),
+            'users'              => User::hydrate($usersRaw),
+            'nextDocumentNumber' => $this->documentNumberService->generate(TransactionTypeEnum::ADJUSTMENT),
+            'adjustingEntries'   => $this->transactionRepository->getPaginated(TransactionTypeEnum::ADJUSTMENT, $filters),
         ];
     }
 
-    public function store(CashReceiptData $data): Transaction
+    public function store(AdjustingEntryData $data): Transaction
     {
         return DB::transaction(function () use ($data) {
-            $documentNumber = $data->documentNumber ?: $this->documentNumberService->generate(TransactionTypeEnum::INCOME);
+            $documentNumber = $data->documentNumber
+                ?: $this->documentNumberService->generate(TransactionTypeEnum::ADJUSTMENT);
+
+            $description = $data->description;
+            if ($data->journalEntryType === JournalEntryTypeEnum::BEGINNING_BALANCES) {
+                // Prepend [SALDO AWAL] as approved
+                $description = '[SALDO AWAL] ' . ($data->description ?? '');
+            }
 
             $transaction = $this->transactionRepository->create([
                 'transaction_date' => $data->transactionDate,
                 'document_number'  => $documentNumber,
-                'transaction_type' => TransactionTypeEnum::INCOME->value,
+                'transaction_type' => TransactionTypeEnum::ADJUSTMENT->value,
                 'program_id'       => $data->programId,
                 'user_id'          => $data->userId,
                 'reference'        => $data->reference,
-                'description'      => $data->description,
+                'description'      => $description,
             ]);
 
+            // GL Double-Entry:
+            // 1. Debit  → COA Transaksi (debitAccountId)
+            // 2. Credit → Lawan COA Transaksi (creditAccountId)
             $this->generalLedgerRepository->createMany([
                 [
                     'transaction_id'      => $transaction->id,
-                    'chart_of_account_id' => $data->cashAccountCode,
+                    'chart_of_account_id' => $data->debitAccountId,
                     'debit'               => $data->amount,
                     'credit'              => 0,
-                    'note'                => 'Penerimaan kas',
+                    'note'                => $data->journalEntryType->value,
                 ],
                 [
                     'transaction_id'      => $transaction->id,
-                    'chart_of_account_id' => $data->transactionAccountCode,
+                    'chart_of_account_id' => $data->creditAccountId,
                     'debit'               => 0,
                     'credit'              => $data->amount,
-                    'note'                => 'Kode transaksi',
+                    'note'                => $data->journalEntryType->value,
                 ],
             ]);
 
@@ -83,49 +92,38 @@ class CashReceiptService
         });
     }
 
-    public function suggestDescription(string $transactionAccountCode): ?string
-    {
-        $coa = ChartOfAccount::with('accountSubcategory.accountCategory')
-            ->find($transactionAccountCode);
-
-        if ($coa === null) {
-            return null;
-        }
-
-        $accountName   = $coa->account_name;
-        $subcategoryId = $coa->accountSubcategory?->id;
-        $categoryId    = $coa->accountSubcategory?->accountCategory?->id;
-
-        $month = now()->translatedFormat('F');
-        $year  = now()->year;
-
-        return match (true) {
-            $accountName === 'Penghasilan Lainnya'
-                => "Penerimaan Bunga Bank {$month} {$year}",
-
-            $subcategoryId === 2 && $categoryId === 1
-                => 'Penarikan Uang Tunai Dari Bank ',
-
-            $accountName === 'Pendapatan Netto Tidak Terikat Periode Berjalan'
-                => 'Penerimaan BPPD Kuitansi No. ',
-
-            $subcategoryId === 3 && $categoryId === 1
-                => "Pembayaran Piutang {$accountName} {$month} {$year}",
-
-            default => '',
-        };
-    }
-
-    public function update(Transaction $transaction, CashReceiptData $data): Transaction
+    public function update(Transaction $transaction, AdjustingEntryData $data): Transaction
     {
         return DB::transaction(function () use ($transaction, $data) {
+            // Check cross-feature editing cases
+            $reference = $data->reference;
+            if ($transaction->transaction_type === TransactionTypeEnum::INCOME) {
+                $cashGl = $transaction->generalLedgers->first(fn($gl) => (float) $gl->debit > 0);
+                if ($cashGl) {
+                    $reference = $cashGl->chart_of_account_id;
+                }
+            } elseif ($transaction->transaction_type === TransactionTypeEnum::EXPENSE) {
+                $cashGl = $transaction->generalLedgers->first(fn($gl) => (float) $gl->credit > 0);
+                if ($cashGl) {
+                    $reference = $cashGl->chart_of_account_id;
+                }
+            }
+
+            $description = $data->description;
+            if ($data->journalEntryType === JournalEntryTypeEnum::BEGINNING_BALANCES) {
+                if ($description === null || !str_starts_with($description, '[SALDO AWAL]')) {
+                    $description = '[SALDO AWAL] ' . ($description ?? '');
+                }
+            }
+
             $transaction->update([
                 'transaction_date' => $data->transactionDate,
                 'document_number'  => $data->documentNumber ?: $transaction->document_number,
+                'transaction_type' => TransactionTypeEnum::ADJUSTMENT->value, // Force to ADJUSTMENT if cross-feature edit
                 'program_id'       => $data->programId,
                 'user_id'          => $data->userId,
-                'reference'        => $data->reference,
-                'description'      => $data->description,
+                'reference'        => $reference,
+                'description'      => $description,
             ]);
 
             $transaction->generalLedgers()->delete();
@@ -133,17 +131,17 @@ class CashReceiptService
             $this->generalLedgerRepository->createMany([
                 [
                     'transaction_id'      => $transaction->id,
-                    'chart_of_account_id' => $data->cashAccountCode,
+                    'chart_of_account_id' => $data->debitAccountId,
                     'debit'               => $data->amount,
                     'credit'              => 0,
-                    'note'                => 'Penerimaan kas',
+                    'note'                => $data->journalEntryType->value,
                 ],
                 [
                     'transaction_id'      => $transaction->id,
-                    'chart_of_account_id' => $data->transactionAccountCode,
+                    'chart_of_account_id' => $data->creditAccountId,
                     'debit'               => 0,
                     'credit'              => $data->amount,
-                    'note'                => 'Kode transaksi',
+                    'note'                => $data->journalEntryType->value,
                 ],
             ]);
 

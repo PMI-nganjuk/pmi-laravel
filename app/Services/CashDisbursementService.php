@@ -25,11 +25,23 @@ class CashDisbursementService
 
     public function getPageData(array $filters = []): array
     {
+        $programsRaw = Cache::remember(
+            'programs.all',
+            now()->addMinutes(10),
+            fn () => Program::all()->map(fn($p) => $p->getAttributes())->toArray()
+        );
+
+        $usersRaw = Cache::remember(
+            'users.all',
+            now()->addMinutes(10),
+            fn () => User::all()->map(fn($u) => $u->getAttributes())->toArray()
+        );
+
         return [
             'cashAccounts'        => $this->coaRepository->getCashAccounts(),
             'transactionAccounts' => $this->coaRepository->getTransactionAccounts(),
-            'programs'            => Cache::remember('programs.all', now()->addMinutes(10), fn () => Program::all()),
-            'users'               => Cache::remember('users.all', now()->addMinutes(10), fn () => User::all()),
+            'programs'            => Program::hydrate($programsRaw),
+            'users'               => User::hydrate($usersRaw),
             'nextDocumentNumber'  => $this->documentNumberService->generate(TransactionTypeEnum::EXPENSE),
             'disbursements'       => $this->transactionRepository->getPaginated(TransactionTypeEnum::EXPENSE, $filters),
         ];
