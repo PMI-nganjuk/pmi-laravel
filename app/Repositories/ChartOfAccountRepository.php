@@ -72,8 +72,6 @@ class ChartOfAccountRepository
 
     protected function clearCache(): void
     {
-        Cache::store('array')->forget('coa.cash_accounts');
-        Cache::store('array')->forget('coa.transaction_accounts');
         Cache::forget('coa.cash_accounts');
         Cache::forget('coa.transaction_accounts');
     }
@@ -103,7 +101,7 @@ class ChartOfAccountRepository
 
     public function getCashAccounts(): SupportCollection
     {
-        return Cache::store('array')->remember(
+        return Cache::remember(
             'coa.cash_accounts',
             now()->addHour(),
             fn () => ChartOfAccount::with('accountSubcategory')
@@ -118,7 +116,7 @@ class ChartOfAccountRepository
 
     public function getTransactionAccounts(): SupportCollection
     {
-        return Cache::store('array')->remember(
+        return Cache::remember(
             'coa.transaction_accounts',
             now()->addHour(),
             fn () => ChartOfAccount::orderBy('id')

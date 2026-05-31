@@ -1,6 +1,7 @@
 <x-app-layout>
     <div
         class="disbursements-page flex min-h-screen bg-slate-50 font-sans text-slate-900"
+        x-cloak
         x-data="createCashDisbursementPageComponent({
             storeUrl:                  @js(route('disbursements.store')),
             updateBaseUrl:             @js(url('/disbursements')),

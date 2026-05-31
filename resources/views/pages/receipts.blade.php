@@ -1,6 +1,7 @@
 <x-app-layout>
     <div
         class="receipts-page flex min-h-screen bg-slate-50 font-sans text-slate-900"
+        x-cloak
         x-data="createCashReceiptPageComponent({
             storeUrl:                  @js(route('receipts.store')),
             updateBaseUrl:             @js(url('/receipts')),

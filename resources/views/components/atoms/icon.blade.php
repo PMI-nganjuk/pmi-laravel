@@ -80,7 +80,7 @@
     @break
 
     @case('logo')
-        <img src="{{ asset('images/logo.svg') }}" {{ $attributes->class(['h-6 w-6 object-contain']) }} alt="Logo PMI" />
+        <img src="{{ asset('images/logo.svg') }}" width="24" height="24" {{ $attributes->class(['h-6 w-6 object-contain']) }} alt="Logo PMI" />
     @break
 
     @case('chart')

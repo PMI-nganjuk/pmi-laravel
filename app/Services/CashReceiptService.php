@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Repositories\ChartOfAccountRepository;
 use App\Repositories\GeneralLedgerRepository;
 use App\Repositories\TransactionRepository;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class CashReceiptService
@@ -27,8 +28,8 @@ class CashReceiptService
         return [
             'cashAccounts'        => $this->coaRepository->getCashAccounts(),
             'transactionAccounts' => $this->coaRepository->getTransactionAccounts(),
-            'programs'            => Program::all(),
-            'users'               => User::all(),
+            'programs'            => Cache::remember('programs.all', now()->addMinutes(10), fn () => Program::all()),
+            'users'               => Cache::remember('users.all', now()->addMinutes(10), fn () => User::all()),
             'nextDocumentNumber'  => $this->documentNumberService->generate(TransactionTypeEnum::INCOME),
             'receipts'            => $this->transactionRepository->getPaginated(TransactionTypeEnum::INCOME, $filters),
         ];
