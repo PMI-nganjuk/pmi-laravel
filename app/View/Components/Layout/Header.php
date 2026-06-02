@@ -43,6 +43,7 @@ class Header extends Component
             'settings.index' => 'Konfigurasi Sistem',
             'users.index' => 'Manajemen Akun',
             'finance.journal' => 'Jurnal Keuangan',
+            'general-ledger.index' => 'Buku Besar (General Ledger)',
             'coa.index' => 'Daftar Chart of Accounts',
             'receipts.index' => 'Penerimaan Kas',
             default => 'Dasbor Utama',

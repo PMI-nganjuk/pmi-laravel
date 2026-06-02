@@ -11,6 +11,7 @@ use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\AdjustingEntryController;
+use App\Http\Controllers\GeneralLedgerController;
 
 
 // Finance: Cash Receipts (Penerimaan Kas)
@@ -62,6 +63,12 @@ Route::middleware(['auth', 'can:finance.view'])
         Route::delete('/{transaction}', [AdjustingEntryController::class, 'destroy'])
             ->middleware('can:finance.create')->name('destroy');
     });
+
+
+// Finance: General Ledger Report (Buku Besar)
+Route::middleware(['auth', 'can:finance.view'])
+    ->get('/general-ledger', [GeneralLedgerController::class, 'index'])
+    ->name('general-ledger.index');
 
 
 Route::resource('coa', ChartOfAccountController::class)->except(['show', 'edit']);

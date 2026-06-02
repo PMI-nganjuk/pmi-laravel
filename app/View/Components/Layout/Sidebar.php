@@ -19,79 +19,154 @@ class Sidebar extends Component
     private function getAuthorizedMenu(): array
     {
         $user = Auth::user();
-        $menu = [];
+        if (!$user) {
+            return [];
+        }
 
-        // General Menu
-        $menu[] = [
-            'label' => 'Ringkasan',
-            'route' => 'dashboard',
-            'icon'  => 'home',
-            'active'=> request()->routeIs('dashboard')
+        $sections = [];
+
+        // 1. Menu Utama (Non-collapsible)
+        $mainMenu = [
+            [
+                'label' => 'Ringkasan',
+                'route' => 'dashboard',
+                'icon'  => 'home',
+                'active'=> request()->routeIs('dashboard')
+            ],
         ];
 
-        $menu[] = [
-            'label' => 'Program Kerja',
-            'route' => 'programs.index',
-            'icon'  => 'briefcase',
-            'active'=> request()->routeIs('programs.*')
+        $sections[] = [
+            'key'         => 'utama',
+            'label'       => 'Menu Utama',
+            'collapsible' => false,
+            'default_open'=> true,
+            'items'       => $mainMenu
         ];
 
-        // Admin Only
-        if ($user->hasRole(RoleEnum::ADMIN)) {
-            $menu[] = [
-                'label' => 'Konfigurasi Sistem',
-                'route' => 'settings.index',
-                'icon'  => 'cog',
-                'active'=> request()->routeIs('settings.*')
+        // 2. Keuangan (Collapsible)
+        if ($user->hasAnyRole([RoleEnum::ADMIN, RoleEnum::FINANCIAL_MANAGER, RoleEnum::FINANCE_STAFF])) {
+            $financeMenu = [
+                [
+                    'label' => 'Penerimaan Kas',
+                    'route' => 'receipts.index',
+                    'icon'  => 'money-add',
+                    'active'=> request()->routeIs('receipts.*')
+                ],
+                [
+                    'label' => 'Pengeluaran Kas',
+                    'route' => 'disbursements.index',
+                    'icon'  => 'money-send',
+                    'active'=> request()->routeIs('disbursements.*')
+                ],
+                [
+                    'label' => 'Jurnal Penyesuaian',
+                    'route' => 'adjusting-entries.index',
+                    'icon'  => 'money-add',
+                    'active'=> request()->routeIs('adjusting-entries.*')
+                ],
+                [
+                    'label' => 'Chart of Accounts',
+                    'route' => 'coa.index',
+                    'icon'  => 'book',
+                    'active'=> request()->routeIs('coa.*')
+                ],
             ];
-            $menu[] = [
-                'label' => 'Manajemen Akun',
-                'route' => 'users.index',
-                'icon'  => 'users',
-                'active'=> request()->routeIs('users.*')
+
+            // Section active status if any item inside is active
+            $isFinanceActive = false;
+            foreach ($financeMenu as $item) {
+                if ($item['active']) {
+                    $isFinanceActive = true;
+                    break;
+                }
+            }
+
+            $sections[] = [
+                'key'         => 'keuangan',
+                'label'       => 'Input Keuangan',
+                'collapsible' => true,
+                'default_open'=> $isFinanceActive,
+                'items'       => $financeMenu
             ];
         }
 
-        // Finance Domain
-        if ($user->hasAnyRole([RoleEnum::ADMIN, RoleEnum::FINANCIAL_MANAGER, RoleEnum::FINANCE_STAFF])) {
-            $menu[] = [
+        $report = [
+            [
+                'label' => 'Buku Besar',
+                'route' => 'general-ledger.index',
+                'icon'  => 'book',
+                'active'=> request()->routeIs('general-ledger.*')
+            ],
+            [
                 'label' => 'Jurnal Keuangan',
                 'route' => 'finance.journal',
                 'icon'  => 'document',
                 'active'=> request()->routeIs('finance.journal')
-            ];
-            $menu[] = [
+            ],
+            [
                 'label' => 'Laporan Finansial',
                 'route' => 'finance.reports',
                 'icon'  => 'chart',
                 'active'=> request()->routeIs('finance.reports')
+            ],
+        ];
+
+        $isReportActive = false;
+        foreach ($report as $item) {
+            if ($item['active']) {
+                $isReportActive = true;
+                break;
+            }
+        }
+
+        $sections[] = [
+            'key'         => 'laporan',
+            'label'       => 'Laporan Keuangan',
+            'collapsible' => true,
+            'default_open'=> $isReportActive,
+            'items'       => $report
+        ];
+
+        // 3. Konfigurasi Sistem (Collapsible)
+        if ($user->hasRole(RoleEnum::ADMIN)) {
+            $systemMenu = [
+                [
+                    'label' => 'Konfigurasi Sistem',
+                    'route' => 'settings.index',
+                    'icon'  => 'cog',
+                    'active'=> request()->routeIs('settings.*')
+                ],
+                [
+                    'label' => 'Manajemen Akun',
+                    'route' => 'users.index',
+                    'icon'  => 'users',
+                    'active'=> request()->routeIs('users.*')
+                ],
+                [
+                    'label' => 'Program Kerja',
+                    'route' => 'programs.index',
+                    'icon'  => 'briefcase',
+                    'active'=> request()->routeIs('programs.*')
+                ],
             ];
-            $menu[] = [
-                'label' => 'Penerimaan Kas',
-                'route' => 'receipts.index',
-                'icon'  => 'money-add',
-                'active'=> request()->routeIs('receipts.*')
-            ];
-            $menu[] = [
-                'label' => 'Pengeluaran Kas',
-                'route' => 'disbursements.index',
-                'icon'  => 'money-send',
-                'active'=> request()->routeIs('disbursements.*')
-            ];
-            $menu[] = [
-                'label' => 'Jurnal Penyesuaian',
-                'route' => 'adjusting-entries.index',
-                'icon'  => 'money-add',
-                'active'=> request()->routeIs('adjusting-entries.*')
-            ];
-            $menu[] = [
-                'label' => 'Chart of Accounts',
-                'route' => 'coa.index',
-                'icon'  => 'book',
-                'active'=> request()->routeIs('coa.*')
+
+            $isSystemActive = false;
+            foreach ($systemMenu as $item) {
+                if ($item['active']) {
+                    $isSystemActive = true;
+                    break;
+                }
+            }
+
+            $sections[] = [
+                'key'         => 'sistem',
+                'label'       => 'Manajemen Organisasi',
+                'collapsible' => true,
+                'default_open'=> $isSystemActive,
+                'items'       => $systemMenu
             ];
         }
 
-        return $menu;
+        return $sections;
     }
 }
