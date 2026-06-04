@@ -40,7 +40,7 @@ class Header extends Component
         
         return match($routeName) {
             'dashboard' => 'Dashboard Ringkasan',
-            'settings.index' => 'Konfigurasi Sistem',
+            'settings.index' => 'Profil Organisasi',
             'users.index' => 'Manajemen Akun',
             'finance.journal' => 'Jurnal Keuangan',
             'general-ledger.index' => 'Buku Besar (General Ledger)',

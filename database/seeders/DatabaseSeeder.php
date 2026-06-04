@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(AccountCategorySeeder::class);
         $this->call(AccountSubcategorySeeder::class);
+        $this->call(FinancialReportTypeSeeder::class);
+        $this->call(ChartOfAccountSeeder::class);
         $this->call(RoleAndPermissionSeeder::class);
     }
 }

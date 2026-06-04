@@ -1,4 +1,4 @@
-<header class="h-16 bg-surface-base border-b border-surface-border flex items-center justify-between px-6 transition-colors duration-200" 
+<header class="h-16 bg-surface-base border-b border-surface-border flex items-center justify-between px-6 transition-colors duration-200 print:hidden" 
         role="banner" 
         aria-label="Site Header">
         

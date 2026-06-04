@@ -85,7 +85,7 @@ class Sidebar extends Component
                 'key'         => 'keuangan',
                 'label'       => 'Input Keuangan',
                 'collapsible' => true,
-                'default_open'=> $isFinanceActive,
+                'default_open'=> true,
                 'items'       => $financeMenu
             ];
         }
@@ -96,6 +96,12 @@ class Sidebar extends Component
                 'route' => 'general-ledger.index',
                 'icon'  => 'book',
                 'active'=> request()->routeIs('general-ledger.*')
+            ],
+            [
+                'label' => 'Laporan Laba Rugi',
+                'route' => 'profit-loss.index',
+                'icon'  => 'chart',
+                'active'=> request()->routeIs('profit-loss.*')
             ],
             [
                 'label' => 'Jurnal Keuangan',
@@ -123,7 +129,7 @@ class Sidebar extends Component
             'key'         => 'laporan',
             'label'       => 'Laporan Keuangan',
             'collapsible' => true,
-            'default_open'=> $isReportActive,
+            'default_open'=> true,
             'items'       => $report
         ];
 
@@ -131,7 +137,7 @@ class Sidebar extends Component
         if ($user->hasRole(RoleEnum::ADMIN)) {
             $systemMenu = [
                 [
-                    'label' => 'Konfigurasi Sistem',
+                    'label' => 'Profil Organisasi',
                     'route' => 'settings.index',
                     'icon'  => 'cog',
                     'active'=> request()->routeIs('settings.*')
@@ -162,7 +168,7 @@ class Sidebar extends Component
                 'key'         => 'sistem',
                 'label'       => 'Manajemen Organisasi',
                 'collapsible' => true,
-                'default_open'=> $isSystemActive,
+                'default_open'=> true,
                 'items'       => $systemMenu
             ];
         }
