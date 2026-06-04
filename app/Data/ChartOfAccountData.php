@@ -6,20 +6,20 @@ class ChartOfAccountData
 {
     public function __construct(
         public readonly string $accountCode,
-        public readonly string $categoryTwo,
+        public readonly int $accountSubcategoryId,
         public readonly string $accountName,
-        public readonly string $entryType,
-        public readonly int $reportTypeId,
+        public readonly string $normalBalance,
+        public readonly int $financialReportTypeId,
     ) {}
 
     public static function fromArray(array $data): self
     {
         return new self(
             accountCode: $data['id'],
-            categoryTwo: $data['category_two'],
+            accountSubcategoryId: (int) $data['account_subcategory_id'],
             accountName: $data['account_name'],
-            entryType: $data['entry_type'],
-            reportTypeId: (int) $data['report_type_id'],
+            normalBalance: $data['normal_balance'],
+            financialReportTypeId: (int) $data['financial_report_type_id'],
         );
     }
 
@@ -27,10 +27,10 @@ class ChartOfAccountData
     {
         return [
             'id' => $this->accountCode,
-            'category_two' => $this->categoryTwo,
+            'account_subcategory_id' => $this->accountSubcategoryId,
             'account_name' => $this->accountName,
-            'entry_type' => $this->entryType,
-            'report_type_id' => $this->reportTypeId,
+            'normal_balance' => $this->normalBalance,
+            'financial_report_type_id' => $this->financialReportTypeId,
         ];
     }
 }

@@ -112,4 +112,22 @@ class OrganizationProfileTest extends TestCase
 
         $response->assertSessionHasErrors(['financial_period_end']);
     }
+
+    /**
+     * Test header displays financial period when it is set.
+     */
+    public function test_header_displays_financial_period_when_configured(): void
+    {
+        $profile = OrganizationProfile::firstOrCreate(['id' => 1]);
+        $profile->update([
+            'financial_period_start' => '2026-01-01',
+            'financial_period_end' => '2026-12-31',
+        ]);
+
+        $admin = User::where('email', 'admin@pmi-nganjuk.or.id')->first();
+
+        $response = $this->actingAs($admin)->get('/dashboard/settings');
+        $response->assertStatus(200);
+        $response->assertSee('Periode: 01/01/2026 s.d 31/12/2026');
+    }
 }

@@ -14,7 +14,7 @@ class GetCategoryTwoOptionsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_one' => ['required', 'string'],
+            'account_category_id' => ['required', 'integer', 'exists:account_categories,id'],
         ];
     }
 }

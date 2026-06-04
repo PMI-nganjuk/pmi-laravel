@@ -39,6 +39,21 @@ class AppServiceProvider extends ServiceProvider
             return false; // Normal users are denied; Admins bypass this via Gate::before
         });
 
+        // Define gates for finance module access
+        Gate::define('finance.view', function ($user) {
+            return $user->hasAnyRole([
+                RoleEnum::FINANCIAL_MANAGER,
+                RoleEnum::FINANCE_STAFF,
+            ]);
+        });
+
+        Gate::define('finance.create', function ($user) {
+            return $user->hasAnyRole([
+                RoleEnum::FINANCIAL_MANAGER,
+                RoleEnum::FINANCE_STAFF,
+            ]);
+        });
+
         // Define a strict rate limiter for login requests (5 attempts per minute per IP)
         RateLimiter::for('login', function (Request $request) {
             return Limit::perMinute(5)->by($request->ip());

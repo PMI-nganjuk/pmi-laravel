@@ -59,13 +59,13 @@ class ChartOfAccountController extends Controller
         }
     }
 
-    public function getCategoryTwo(GetCategoryTwoOptionsRequest $request)
+    public function getAccountSubcategory(GetCategoryTwoOptionsRequest $request)
     {
         $validated = $request->validated();
 
         return response()->json([
             'success' => true,
-            'data' => $this->service->getCategoryTwoOptions($validated['category_one']),
+            'data' => $this->service->getAccountSubcategoryOptions($validated['account_category_id']),
         ]);
     }
 
@@ -77,8 +77,8 @@ class ChartOfAccountController extends Controller
             'success' => true,
             'data' => [
                 'code' => $this->service->generateAccountCode(
-                    $validated['category_one'],
-                    $validated['category_two'],
+                    $validated['account_category_id'],
+                    $validated['account_subcategory_id'],
                 ),
             ],
         ]);

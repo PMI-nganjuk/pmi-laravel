@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\OrganizationProfile;
 use App\Repositories\OrganizationProfileRepository;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class OrganizationProfileService
@@ -17,7 +18,11 @@ class OrganizationProfileService
      */
     public function getProfile(): OrganizationProfile
     {
-        return $this->repository->firstOrCreate();
+        $raw = Cache::remember('organization.profile', now()->addHour(), function () {
+            return $this->repository->firstOrCreate()->getAttributes();
+        });
+
+        return (new OrganizationProfile)->newFromBuilder($raw);
     }
 
     /**
@@ -27,7 +32,9 @@ class OrganizationProfileService
     {
         return DB::transaction(function () use ($data) {
             $profile = $this->repository->firstOrCreate();
-            return $this->repository->update($profile, $data);
+            $updated = $this->repository->update($profile, $data);
+            Cache::forget('organization.profile');
+            return $updated;
         });
     }
 }

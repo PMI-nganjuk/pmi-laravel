@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-layout.shell
-        page-title="Konfigurasi Sistem"
+        page-title="Profil Organisasi"
         x-data="settingsPage"
     >
         <main class="flex-1 overflow-y-auto p-6 space-y-6">

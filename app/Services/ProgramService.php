@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Program;
 use App\Repositories\ProgramRepository;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ProgramService
@@ -29,7 +30,9 @@ class ProgramService
     public function store(array $data): Program
     {
         return DB::transaction(function () use ($data) {
-            return $this->repository->create($data);
+            $program = $this->repository->create($data);
+            Cache::forget('programs.all');
+            return $program;
         });
     }
 
@@ -39,7 +42,9 @@ class ProgramService
     public function update(Program $program, array $data): Program
     {
         return DB::transaction(function () use ($program, $data) {
-            return $this->repository->update($program, $data);
+            $updated = $this->repository->update($program, $data);
+            Cache::forget('programs.all');
+            return $updated;
         });
     }
 
@@ -50,6 +55,7 @@ class ProgramService
     {
         DB::transaction(function () use ($program) {
             $this->repository->delete($program);
+            Cache::forget('programs.all');
         });
     }
 }

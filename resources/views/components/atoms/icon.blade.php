@@ -47,6 +47,14 @@
         <x-fas-book-open {{ $attributes->class(['h-5 w-5']) }}/>
     @break
 
+    @case('money-add')
+        <x-hugeicons-money-add-02 {{ $attributes->class(['h-5 w-5']) }}/>
+    @break
+
+    @case('money-send')
+        <x-hugeicons-money-send-02 {{ $attributes->class(['h-5 w-5']) }}/>
+    @break
+
     @case('chevron-down')
         <svg {{ $attributes->class(['h-4 w-4']) }} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
             <path fill-rule="evenodd" d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" clip-rule="evenodd" />
@@ -72,7 +80,7 @@
     @break
 
     @case('logo')
-        <img src="{{ asset('images/logo.png') }}" {{ $attributes->class(['h-6 w-6 object-contain']) }} alt="Logo PMI" />
+        <img src="{{ asset('images/logo.svg') }}" width="24" height="24" {{ $attributes->class(['h-6 w-6 object-contain']) }} alt="Logo PMI" />
     @break
 
     @case('chart')

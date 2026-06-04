@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Data\ChartOfAccountData;
 use App\Enums\EntryTypeEnum;
 use App\Models\ChartOfAccount;
+use App\Models\AccountSubcategory;
 use App\Repositories\ChartOfAccountRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
@@ -18,36 +19,40 @@ class ChartOfAccountService
     public function getPageData(array $filters = []): array
     {
         return [
-            'categoryOneOptions' => $this->repository->getCategoryOneOptions(),
-            'reportTypeOptions' => $this->repository->getReportTypeOptions(),
-            'entryTypeOptions' => EntryTypeEnum::cases(),
+            'accountCategoryOptions' => $this->repository->getAccountCategoryOptions(),
+            'financialReportTypeOptions' => $this->repository->getFinancialReportTypeOptions(),
+            'normalBalanceOptions' => EntryTypeEnum::cases(),
             'coas' => $this->repository->getPaginated($filters),
         ];
     }
 
-    public function getCategoryTwoOptions(string $categoryOneCode): Collection
+    public function getAccountSubcategoryOptions(int $accountCategoryId): Collection
     {
-        return $this->repository->getCategoryTwoOptions($categoryOneCode);
+        return $this->repository->getAccountSubcategoryOptions($accountCategoryId);
     }
 
-    public function generateAccountCode(?string $categoryOneCode, ?string $categoryTwoCode): ?string
+    public function generateAccountCode(?int $accountCategoryId, ?int $accountSubcategoryId): ?string
     {
-        if (!$categoryOneCode || !$categoryTwoCode) {
+        if (!$accountCategoryId || !$accountSubcategoryId) {
             return null;
         }
 
-        $prefix = $categoryOneCode . $categoryTwoCode;
-        $lastAccountCode = $this->repository->getLastAccountCodeByPrefix($prefix);
+        $subCategoryIndex = AccountSubcategory::where('account_category_id', $accountCategoryId)
+            ->where('id', '<=', $accountSubcategoryId)
+            ->count();
 
+        $prefix = $accountCategoryId . $subCategoryIndex;
+        $lastAccountCode = $this->repository->getLastAccountCodeByPrefix($prefix . '%');
+
+        $sequence = 0;
         if ($lastAccountCode) {
-            $mainPart = explode(' - ', $lastAccountCode)[0] ?? '';
-            $sequence = (int) substr($mainPart, strlen($prefix));
-            $nextSequence = str_pad($sequence + 1, 3, '0', STR_PAD_LEFT);
-        } else {
-            $nextSequence = '001';
+            $sequence = (int) substr($lastAccountCode, 2, 2);
+            $sequence++;
         }
 
-        return $prefix . $nextSequence . ' - 00';
+        $formattedSequence = str_pad((string) $sequence, 2, '0', STR_PAD_LEFT);
+
+        return sprintf('%s%s1-00', $prefix, $formattedSequence);
     }
 
     public function store(ChartOfAccountData $data): ChartOfAccount

@@ -3,43 +3,44 @@
 namespace App\Repositories;
 
 use App\Models\ChartOfAccount;
-use App\Models\CategoryOne;
-use App\Models\CategoryTwo;
-use App\Models\ReportTypes;
+use App\Models\AccountCategory;
+use App\Models\AccountSubcategory;
+use App\Models\FinancialReportType;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Support\Facades\Cache;
 
 class ChartOfAccountRepository
 {
     public function getPaginated(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
-        $query = ChartOfAccount::with(['categoryTwo.categoryOne', 'reportType']);
+        $query = ChartOfAccount::with(['accountSubcategory.accountCategory', 'financialReportType']);
 
         if ($search = $filters['search'] ?? null) {
             $query->where(function ($query) use ($search) {
                 $query->where('id', 'like', "%{$search}%")
                     ->orWhere('account_name', 'like', "%{$search}%")
-                    ->orWhereHas('categoryTwo', function ($query) use ($search) {
-                        $query->where('category_name', 'like', "%{$search}%");
+                    ->orWhereHas('accountSubcategory', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%");
                     })
-                    ->orWhereHas('categoryTwo.categoryOne', function ($query) use ($search) {
-                        $query->where('category_name', 'like', "%{$search}%");
+                    ->orWhereHas('accountSubcategory.accountCategory', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%");
                     })
-                    ->orWhereHas('reportType', function ($query) use ($search) {
-                        $query->where('report_name', 'like', "%{$search}%");
+                    ->orWhereHas('financialReportType', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%");
                     });
             });
         }
 
-        if ($entryType = $filters['entry_type'] ?? null) {
-            $query->where('entry_type', $entryType);
+        if ($normalBalance = $filters['normal_balance'] ?? null) {
+            $query->where('normal_balance', $normalBalance);
         }
 
-        if ($reportTypeId = $filters['report_type_id'] ?? null) {
-            $query->where('report_type_id', $reportTypeId);
+        if ($reportTypeId = $filters['financial_report_type_id'] ?? null) {
+            $query->where('financial_report_type_id', $reportTypeId);
         }
 
-        $allowedSorts = ['id', 'account_name', 'entry_type', 'report_type_id', 'created_at'];
+        $allowedSorts = ['id', 'account_name', 'normal_balance', 'financial_report_type_id', 'created_at'];
         $sortBy = in_array($filters['sort_by'] ?? null, $allowedSorts, true) ? $filters['sort_by'] : 'id';
         $sortDir = ($filters['sort_dir'] ?? null) === 'desc' ? 'desc' : 'asc';
 
@@ -51,35 +52,44 @@ class ChartOfAccountRepository
 
     public function create(array $attributes): ChartOfAccount
     {
-        return ChartOfAccount::create($attributes);
+        $coa = ChartOfAccount::create($attributes);
+        $this->clearCache();
+        return $coa;
     }
 
     public function update(ChartOfAccount $chartOfAccount, array $attributes): ChartOfAccount
     {
         $chartOfAccount->update($attributes);
-
+        $this->clearCache();
         return $chartOfAccount;
     }
 
     public function delete(ChartOfAccount $chartOfAccount): void
     {
         $chartOfAccount->delete();
+        $this->clearCache();
     }
 
-    public function getCategoryOneOptions(): SupportCollection
+    protected function clearCache(): void
     {
-        return CategoryOne::pluck('category_name', 'category_code');
+        Cache::forget('coa.cash_accounts');
+        Cache::forget('coa.transaction_accounts');
     }
 
-    public function getCategoryTwoOptions(string $categoryOneCode): SupportCollection
+    public function getAccountCategoryOptions(): SupportCollection
     {
-        return CategoryTwo::where('category_one', $categoryOneCode)
-            ->pluck('category_name', 'category_code');
+        return AccountCategory::pluck('name', 'id');
     }
 
-    public function getReportTypeOptions(): SupportCollection
+    public function getAccountSubcategoryOptions(int $accountCategoryId): SupportCollection
     {
-        return ReportTypes::pluck('report_name', 'id');
+        return AccountSubcategory::where('account_category_id', $accountCategoryId)
+            ->pluck('name', 'id');
+    }
+
+    public function getFinancialReportTypeOptions(): SupportCollection
+    {
+        return FinancialReportType::pluck('name', 'id');
     }
 
     public function getLastAccountCodeByPrefix(string $prefix): ?string
@@ -87,5 +97,38 @@ class ChartOfAccountRepository
         return ChartOfAccount::where('id', 'like', $prefix . '%')
             ->orderByDesc('id')
             ->value('id');
+    }
+
+    public function getCashAccounts(): SupportCollection
+    {
+        $raw = Cache::remember(
+            'coa.cash_accounts',
+            now()->addHour(),
+            fn () => ChartOfAccount::with('accountSubcategory')
+                ->whereHas('accountSubcategory', function ($q) {
+                    $q->where('id', '<=', 2)
+                      ->where('account_category_id', 1);
+                })
+                ->orderBy('id')
+                ->get(['id', 'account_name'])
+                ->map(fn($coa) => $coa->getAttributes())
+                ->toArray()
+        );
+
+        return ChartOfAccount::hydrate($raw);
+    }
+
+    public function getTransactionAccounts(): SupportCollection
+    {
+        $raw = Cache::remember(
+            'coa.transaction_accounts',
+            now()->addHour(),
+            fn () => ChartOfAccount::orderBy('id')
+                ->get(['id', 'account_name'])
+                ->map(fn($coa) => $coa->getAttributes())
+                ->toArray()
+        );
+
+        return ChartOfAccount::hydrate($raw);
     }
 }

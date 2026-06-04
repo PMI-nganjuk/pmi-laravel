@@ -1,4 +1,4 @@
-<header class="h-16 bg-surface-base border-b border-surface-border flex items-center justify-between px-6 transition-colors duration-200" 
+<header class="h-16 bg-surface-base border-b border-surface-border flex items-center justify-between px-6 transition-colors duration-200 print:hidden" 
         role="banner" 
         aria-label="Site Header">
         
@@ -12,10 +12,17 @@
             <x-atoms.icon name="menu" class="h-6 w-6" />
         </button>
         
-        <!-- Page Title Dynamic -->
-        <h1 class="text-xl font-bold text-content-base tracking-tight" id="page-title">
-            {{ $pageTitle }}
-        </h1>
+        <!-- Page Title and Period -->
+        <div class="flex flex-col justify-center">
+            <h1 class="text-lg md:text-xl font-bold text-content-base tracking-tight leading-tight" id="page-title">
+                {{ $pageTitle }}
+            </h1>
+            @if(!empty($financialPeriod))
+                <p class="text-[10px] md:text-xs text-content-muted font-medium leading-none mt-0.5" id="header-period">
+                    Periode: {{ $financialPeriod }}
+                </p>
+            @endif
+        </div>
     </div>
 
     <!-- Right Profile Information -->

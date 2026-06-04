@@ -14,8 +14,8 @@ class GenerateAccountCodeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_one' => ['required', 'string'],
-            'category_two' => ['required', 'string'],
+            'account_category_id' => ['required', 'integer', 'exists:account_categories,id'],
+            'account_subcategory_id' => ['required', 'integer', 'exists:account_subcategories,id'],
         ];
     }
 }

@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('report_types', function (Blueprint $table) {
-            $table->id('id');
-            $table->string('report_name', 100);
+        Schema::create('account_categories', function (Blueprint $table) {
+            $table->id(); 
+            $table->string('name', 100); 
             $table->timestamps();
         });
     }
@@ -23,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('report_types');
+        Schema::dropIfExists('account_categories');
     }
 };

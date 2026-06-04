@@ -14,16 +14,10 @@ return new class extends Migration
     {
         Schema::create('chart_of_accounts', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->foreignId('category_two')
-                  ->index()
-                  ->constrained(table: 'category_twos', column: 'category_code')
-                  ->cascadeOnDelete();
+            $table->foreignId('account_subcategory_id')->index()->constrained('account_subcategories')->cascadeOnDelete();
             $table->string('account_name', 100);
-            $table->enum('entry_type', array_column(EntryTypeEnum::cases(), 'value'));
-            $table->foreignId('report_type_id')
-                  ->index()
-                  ->constrained(table: 'report_types', column: 'id')
-                  ->cascadeOnDelete();
+            $table->enum('normal_balance', array_column(EntryTypeEnum::cases(), 'value'));
+            $table->foreignId('financial_report_type_id')->index()->constrained('financial_report_types')->cascadeOnDelete();
             $table->timestamps();
         });
     }
