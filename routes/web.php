@@ -13,6 +13,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\AdjustingEntryController;
 use App\Http\Controllers\GeneralLedgerController;
 use App\Http\Controllers\ProfitLossController;
+use App\Http\Controllers\BalanceSheetController;
 
 
 // Finance: Cash Receipts (Penerimaan Kas)
@@ -79,6 +80,15 @@ Route::middleware(['auth', 'can:finance.view'])
 Route::middleware(['auth', 'can:finance.view'])
     ->get('/profit-loss/export', [ProfitLossController::class, 'export'])
     ->name('profit-loss.export');
+
+// Laporan Posisi Keuangan
+Route::middleware(['auth', 'can:finance.view'])
+    ->get('/balance-sheet', [BalanceSheetController::class, 'index'])
+    ->name('balance-sheet.index');
+
+Route::middleware(['auth', 'can:finance.view'])
+    ->get('/balance-sheet/export', [BalanceSheetController::class, 'export'])
+    ->name('balance-sheet.export');
 
 
 Route::resource('coa', ChartOfAccountController::class)->except(['show', 'edit']);

@@ -104,6 +104,12 @@ class Sidebar extends Component
                 'active'=> request()->routeIs('profit-loss.*')
             ],
             [
+                'label' => 'Laporan Posisi Keuangan',
+                'route' => 'balance-sheet.index',
+                'icon'  => 'chart',
+                'active'=> request()->routeIs('balance-sheet.*')
+            ],
+            [
                 'label' => 'Jurnal Keuangan',
                 'route' => 'finance.journal',
                 'icon'  => 'document',
