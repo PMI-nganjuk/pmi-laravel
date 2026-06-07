@@ -43,8 +43,8 @@ class BalanceSheetExport implements FromView, WithTitle, WithColumnWidths, WithS
     {
         return [
             'A' => 3,
-            'B' => 8,
-            'C' => 45,
+            'B' => 4,
+            'C' => 45,  
             'D' => 22,
             'E' => 22,
         ];
