@@ -11,7 +11,7 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ProfitLossExport implements FromView, WithTitle, WithColumnWidths, WithStyles, WithEvents
+class CashFlowExport implements FromView, WithTitle, WithColumnWidths, WithStyles, WithEvents
 {
     public function __construct(
         protected array $reportData
@@ -19,32 +19,37 @@ class ProfitLossExport implements FromView, WithTitle, WithColumnWidths, WithSty
 
     public function view(): View
     {
-        return view('exports.profit-loss', [
+        return view('exports.cash-flow', [
             'report' => $this->reportData,
         ]);
     }
 
     public function title(): string
     {
-        return 'Laporan Aktivitas';
+        return 'Laporan Arus Kas';
     }
 
+    /**
+     * Lebar kolom:
+     * A = margin kiri kosong
+     * B = kolom Uraian (lebar)
+     * C = kolom Tahun Berjalan
+     */
     public function columnWidths(): array
     {
         return [
-            'A' => 3,   // Spacer
-            'B' => 4,   // Nomor
-            'C' => 45,  // Uraian
-            'D' => 22,  // Tidak Terikat
-            'E' => 22,  // Terikat
-            'F' => 22,  // Total
+            'A' => 3,
+            'B' => 4,
+            'C' => 58,  
+            'D' => 22,
+            'E' => 22,
         ];
     }
 
     public function styles(Worksheet $sheet): array
     {
         return [
-            'A:F' => [
+            'A:E' => [
                 'font' => ['name' => 'Calibri', 'size' => 10],
             ],
         ];
@@ -56,7 +61,7 @@ class ProfitLossExport implements FromView, WithTitle, WithColumnWidths, WithSty
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
-                $sheet->getPageSetup()->setPrintArea('A1:F' . $sheet->getHighestRow());
+                $sheet->getPageSetup()->setPrintArea('A1:E' . $sheet->getHighestRow());
                 $sheet->getPageSetup()->setOrientation(
                     \PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_PORTRAIT
                 );

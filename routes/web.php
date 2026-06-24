@@ -14,6 +14,8 @@ use App\Http\Controllers\AdjustingEntryController;
 use App\Http\Controllers\GeneralLedgerController;
 use App\Http\Controllers\ProfitLossController;
 use App\Http\Controllers\BalanceSheetController;
+use App\Http\Controllers\AnalysisNotesController;
+use App\Http\Controllers\CashFlowController;
 
 
 // Finance: Cash Receipts (Penerimaan Kas)
@@ -89,6 +91,24 @@ Route::middleware(['auth', 'can:finance.view'])
 Route::middleware(['auth', 'can:finance.view'])
     ->get('/balance-sheet/export', [BalanceSheetController::class, 'export'])
     ->name('balance-sheet.export');
+
+// Laporan Perubahan Aset Netto (Analysis Notes)
+Route::middleware(['auth', 'can:finance.view'])
+    ->get('/analysis-notes', [AnalysisNotesController::class, 'index'])
+    ->name('analysis-notes.index');
+
+Route::middleware(['auth', 'can:finance.view'])
+    ->get('/analysis-notes/export', [AnalysisNotesController::class, 'export'])
+    ->name('analysis-notes.export');
+
+// Laporan Arus Kas (Cash Flow)
+Route::middleware(['auth', 'can:finance.view'])
+    ->get('/cash-flow', [CashFlowController::class, 'index'])
+    ->name('cash-flow.index');
+
+Route::middleware(['auth', 'can:finance.view'])
+    ->get('/cash-flow/export', [CashFlowController::class, 'export'])
+    ->name('cash-flow.export');
 
 
 Route::resource('coa', ChartOfAccountController::class)->except(['show', 'edit']);

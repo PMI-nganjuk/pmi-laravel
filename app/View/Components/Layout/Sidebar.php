@@ -110,16 +110,16 @@ class Sidebar extends Component
                 'active'=> request()->routeIs('balance-sheet.*')
             ],
             [
-                'label' => 'Jurnal Keuangan',
-                'route' => 'finance.journal',
-                'icon'  => 'document',
-                'active'=> request()->routeIs('finance.journal')
+                'label' => 'Laporan Alur Kas',
+                'route' => 'cash-flow.index',
+                'icon'  => 'chart',
+                'active'=> request()->routeIs('cash-flow.*')
             ],
             [
-                'label' => 'Laporan Finansial',
-                'route' => 'finance.reports',
+                'label' => 'Laporan Perubahan Aset Netto',
+                'route' => 'analysis-notes.index',
                 'icon'  => 'chart',
-                'active'=> request()->routeIs('finance.reports')
+                'active'=> request()->routeIs('analysis-notes.*')
             ],
         ];
 
