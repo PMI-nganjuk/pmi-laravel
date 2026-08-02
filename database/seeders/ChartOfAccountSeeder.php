@@ -9,7 +9,7 @@ use Illuminate\Database\Seeder;
 class ChartOfAccountSeeder extends Seeder
 {
     /**
-     * Seed Chart of Accounts untuk Laba Rugi.
+     * Seed Chart of Accounts untuk Neraca dan Laba Rugi.
      */
     public function run(): void
     {
@@ -17,6 +17,22 @@ class ChartOfAccountSeeder extends Seeder
         $subcategoryMap = AccountSubcategory::pluck('id', 'name')->toArray();
 
         $accounts = [
+            // ================== NERACA (REPORT TYPE 1) ==================
+            // 1. Aset Lancar
+            ['id' => '11001-00', 'subcategory' => 'Kas', 'account_name' => 'Kas Kecil', 'normal_balance' => 'D', 'report_type' => 1],
+            ['id' => '11002-00', 'subcategory' => 'Bank', 'account_name' => 'Bank Mandiri (Operasional)', 'normal_balance' => 'D', 'report_type' => 1],
+            ['id' => '12001-00', 'subcategory' => 'Piutang Lain-lain', 'account_name' => 'Piutang Karyawan', 'normal_balance' => 'D', 'report_type' => 1],
+            ['id' => '13001-00', 'subcategory' => 'Aset Tetap Lainnya', 'account_name' => 'Inventaris Kantor', 'normal_balance' => 'D', 'report_type' => 1],
+
+            // 2. Liabilitas
+            ['id' => '21001-00', 'subcategory' => 'Hutang Kepada Lembaga Lain', 'account_name' => 'Hutang Bank', 'normal_balance' => 'C', 'report_type' => 1],
+            ['id' => '22001-00', 'subcategory' => 'Hutang Lain-lain', 'account_name' => 'Hutang Pihak Ketiga', 'normal_balance' => 'C', 'report_type' => 1],
+
+            // 3. Aset Netto
+            ['id' => '31001-00', 'subcategory' => 'Akumulasi Aset Netto Tidak Terikat', 'account_name' => 'Aset Netto Tidak Terikat', 'normal_balance' => 'C', 'report_type' => 1],
+            ['id' => '32001-00', 'subcategory' => 'Akumulasi Aset Netto Terikat', 'account_name' => 'Aset Netto Terikat', 'normal_balance' => 'C', 'report_type' => 1],
+
+            // ================== LABA RUGI (REPORT TYPE 2) ==================
             // 5. Pendapatan
             ['id' => '51001-00', 'subcategory' => 'Sumbangan', 'account_name' => 'Sumbangan Institusi',        'normal_balance' => 'C', 'report_type' => 2],
             ['id' => '51011-00', 'subcategory' => 'Sumbangan', 'account_name' => 'Sumbangan Individual',        'normal_balance' => 'C', 'report_type' => 2],
@@ -93,6 +109,6 @@ class ChartOfAccountSeeder extends Seeder
             );
         }
 
-        $this->command->info('Seeded ' . count($accounts) . ' Chart of Account entries (Laba Rugi).');
+        $this->command->info('Seeded ' . count($accounts) . ' Chart of Account entries (Neraca & Laba Rugi).');
     }
 }

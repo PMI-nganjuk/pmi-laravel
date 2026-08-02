@@ -7,9 +7,6 @@ use Illuminate\Database\Seeder;
 
 class FinancialReportTypeSeeder extends Seeder
 {
-    /**
-     * Seed tipe laporan keuangan.
-     */
     public function run(): void
     {
         $types = [
