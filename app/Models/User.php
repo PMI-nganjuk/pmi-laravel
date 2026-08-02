@@ -17,7 +17,6 @@ class User extends Authenticatable
 {
     // Role Constants
     public const ROLE_ADMIN             = 'Admin';
-    public const ROLE_MANAGER_KEUANGAN  = 'Manager keuangan';
     public const ROLE_STAF_KEUANGAN     = 'Staf Keuangan';
     public const ROLE_KARYAWAN          = 'Karyawan';
     public const ROLE_PENGGUNA          = 'Pengguna Umum';

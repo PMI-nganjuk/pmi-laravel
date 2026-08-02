@@ -39,7 +39,7 @@
                         </div>
                     @endif
 
-                    @if($user->hasAnyRole([\App\Enums\RoleEnum::FINANCIAL_MANAGER, \App\Enums\RoleEnum::FINANCE_STAFF]))
+                    @if($user->hasRole(\App\Enums\RoleEnum::FINANCE_STAFF))
                         <!-- Financial Stats -->
                         <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex flex-col justify-between">
                             <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Saldo Kas</span>
@@ -119,17 +119,7 @@
                                 </div>
                             @endif
 
-                            @if($user->role === \App\Enums\RoleEnum::FINANCIAL_MANAGER)
-                                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-                                    <div>
-                                        <span class="text-sm font-bold text-slate-900 block">Persetujuan Pencairan Kas</span>
-                                        <span class="text-xs text-slate-500">Ada {{ $stats['pending_approvals'] }} pengajuan pengeluaran kas yang butuh validasi</span>
-                                    </div>
-                                    <button class="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-xs font-bold rounded-lg text-white transition">Periksa</button>
-                                </div>
-                            @endif
-
-                            @if($user->hasAnyRole([\App\Enums\RoleEnum::FINANCIAL_MANAGER, \App\Enums\RoleEnum::FINANCE_STAFF]))
+                            @if($user->hasRole(\App\Enums\RoleEnum::FINANCE_STAFF))
                                 <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
                                     <div>
                                         <span class="text-sm font-bold text-slate-900 block">Pencatatan Jurnal Baru</span>
@@ -173,10 +163,6 @@
                                 <li class="flex items-start gap-2">
                                     <span class="h-1.5 w-1.5 bg-red-500 rounded-full mt-1.5 shrink-0"></span>
                                     <span class="text-slate-700"><strong>Administrator (Admin):</strong> Memiliki bypass penuh pada seluruh pemeriksaan gerbang otorisasi.</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="h-1.5 w-1.5 bg-purple-500 rounded-full mt-1.5 shrink-0"></span>
-                                    <span class="text-slate-700"><strong>Manager Keuangan:</strong> Berwenang memvalidasi pengeluaran kas dan memeriksa seluruh laporan keuangan bulanan.</span>
                                 </li>
                                 <li class="flex items-start gap-2">
                                     <span class="h-1.5 w-1.5 bg-blue-500 rounded-full mt-1.5 shrink-0"></span>

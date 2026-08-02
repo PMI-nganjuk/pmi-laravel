@@ -5,7 +5,6 @@ namespace App\Enums;
 enum RoleEnum: string
 {
     case ADMIN = 'Admin';
-    case FINANCIAL_MANAGER = 'Manager keuangan';
     case FINANCE_STAFF = 'Staf Keuangan';
     case STAFF = 'Karyawan';
     case USER = 'Pengguna Umum';
@@ -24,7 +23,6 @@ enum RoleEnum: string
     {
         return match($this) {
             self::ADMIN => 'error',
-            self::FINANCIAL_MANAGER => 'accent',
             self::FINANCE_STAFF => 'info',
             self::STAFF => 'warning',
             default => 'neutral',

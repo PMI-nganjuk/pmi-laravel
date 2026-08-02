@@ -44,7 +44,7 @@ class Sidebar extends Component
         ];
 
         // 2. Keuangan (Collapsible)
-        if ($user->hasAnyRole([RoleEnum::ADMIN, RoleEnum::FINANCIAL_MANAGER, RoleEnum::FINANCE_STAFF])) {
+        if ($user->hasAnyRole([RoleEnum::ADMIN, RoleEnum::FINANCE_STAFF])) {
             $financeMenu = [
                 [
                     'label' => 'Penerimaan Kas',
