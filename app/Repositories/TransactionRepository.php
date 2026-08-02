@@ -51,6 +51,8 @@ class TransactionRepository
             // Keep it unfiltered if DB is not migrated or profile service fails
         }
 
+        $perPage = (int) ($filters['per_page'] ?? $perPage);
+
         if ($search = $filters['search'] ?? null) {
             $query->where(function ($q) use ($search) {
                 $q->where('document_number', 'like', "%{$search}%")
@@ -76,13 +78,64 @@ class TransactionRepository
             });
         }
 
-        if ($date = $filters['transaction_date'] ?? null) {
-            $query->whereDate('transaction_date', $date);
+        if (!empty($filters['filter_tanggal'])) {
+            $query->where('transaction_date', 'like', '%' . $filters['filter_tanggal'] . '%');
+        }
+        if (!empty($filters['filter_no_dokumen'])) {
+            $query->where('document_number', 'like', '%' . $filters['filter_no_dokumen'] . '%');
+        }
+        if (!empty($filters['filter_program'])) {
+            $query->whereHas('program', function ($q) use ($filters) {
+                $q->where('name', 'like', '%' . $filters['filter_program'] . '%');
+            });
+        }
+        if (!empty($filters['filter_referensi'])) {
+            $query->where('reference', 'like', '%' . $filters['filter_referensi'] . '%');
+        }
+        if (!empty($filters['filter_keterangan'])) {
+            $query->where('description', 'like', '%' . $filters['filter_keterangan'] . '%');
+        }
+        if (!empty($filters['filter_pic'])) {
+            $query->whereHas('user', function ($q) use ($filters) {
+                $q->where('name', 'like', '%' . $filters['filter_pic'] . '%');
+            });
+        }
+        if (!empty($filters['filter_coa'])) {
+            $query->whereHas('generalLedgers.chartOfAccount', function ($q) use ($filters) {
+                $q->where('account_name', 'like', '%' . $filters['filter_coa'] . '%')
+                  ->orWhere('id', 'like', '%' . $filters['filter_coa'] . '%');
+            });
+        }
+        if (!empty($filters['filter_nominal'])) {
+            $query->whereHas('generalLedgers', function ($q) use ($filters) {
+                $q->where('debit', 'like', '%' . $filters['filter_nominal'] . '%')
+                  ->orWhere('credit', 'like', '%' . $filters['filter_nominal'] . '%');
+            });
+        }
+        if (!empty($filters['filter_debit'])) {
+            $query->whereHas('generalLedgers', function ($q) use ($filters) {
+                $q->where('debit', 'like', '%' . $filters['filter_debit'] . '%');
+            });
+        }
+        if (!empty($filters['filter_kredit'])) {
+            $query->whereHas('generalLedgers', function ($q) use ($filters) {
+                $q->where('credit', 'like', '%' . $filters['filter_kredit'] . '%');
+            });
+        }
+        if (!empty($filters['filter_jenis_entri'])) {
+            $query->whereHas('generalLedgers', function ($q) use ($filters) {
+                $q->where('note', 'like', '%' . $filters['filter_jenis_entri'] . '%');
+            });
         }
 
         $allowedSorts = ['transaction_date', 'document_number', 'created_at'];
         $sortBy  = in_array($filters['sort_by'] ?? null, $allowedSorts, true) ? $filters['sort_by'] : 'transaction_date';
         $sortDir = ($filters['sort_dir'] ?? null) === 'asc' ? 'asc' : 'desc';
+
+        if ($perPage === -1) {
+            $perPage = $query->count();
+            if ($perPage === 0) $perPage = 1; 
+        }
 
         return $query->orderBy($sortBy, $sortDir)->paginate($perPage)->withQueryString();
     }
