@@ -102,32 +102,42 @@
                         </div>
                     </div>
 
-                    <!-- Section: Periode Buku -->
+                    <!-- Section: Manual Book -->
                     <div class="pt-4 border-t border-surface-border">
-                        <h3 class="text-sm font-bold text-content-base border-l-4 border-primary pl-2 mb-4">Periode Buku</h3>
-                        <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
-                            <x-atoms.input
-                                name="financial_period_start"
-                                type="date"
-                                label="Periode Awal"
-                                x-model="financialPeriodStart"
-                                x-on:change="updateFiscalYear()"
-                            />
-                            
-                            <x-atoms.input
-                                name="financial_period_end"
-                                type="date"
-                                label="Periode Akhir"
-                                x-model="financialPeriodEnd"
-                            />
+                        <h3 class="text-sm font-bold text-content-base border-l-4 border-primary pl-2 mb-4">Manual Book</h3>
+                        <div class="bg-surface-base border border-surface-border rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+                            <div>
+                                <h4 class="font-bold text-content-base">Panduan Penggunaan Aplikasi</h4>
+                                <p class="text-sm text-content-muted mt-1">Akses dokumen panduan lengkap untuk mempelajari cara penggunaan sistem keuangan ini.</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                                <x-atoms.button 
+                                    type="button" 
+                                    variant="outline" 
+                                    size="md" 
+                                    @click="navigator.clipboard.writeText('#'); alert('Link Manual Book berhasil disalin!')"
+                                    class="w-full sm:w-auto justify-center"
+                                >
+                                    <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                    </svg>
+                                    Salin Link
+                                </x-atoms.button>
 
-                            <x-atoms.input
-                                name="fiscal_year"
-                                type="number"
-                                label="Tahun Buku"
-                                x-model="fiscalYear"
-                                placeholder="Tahun"
-                            />
+                                <a href="#" target="_blank" class="w-full sm:w-auto">
+                                    <x-atoms.button 
+                                        type="button" 
+                                        variant="info" 
+                                        size="md" 
+                                        class="w-full justify-center"
+                                    >
+                                        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                        </svg>
+                                        Buka Manual Book
+                                    </x-atoms.button>
+                                </a>
+                            </div>
                         </div>
                     </div>
 
@@ -160,19 +170,7 @@
                 chairperson: @js(old('chairperson', $profile->chairperson ?? '')),
                 headquartersTreasurer: @js(old('headquarters_treasurer', $profile->headquarters_treasurer ?? '')),
                 bloodDonationUnitTreasurer: @js(old('blood_donation_unit_treasurer', $profile->blood_donation_unit_treasurer ?? '')),
-                financialPeriodStart: @js(old('financial_period_start', $profile->financial_period_start ? $profile->financial_period_start->format('Y-m-d') : '')),
-                financialPeriodEnd: @js(old('financial_period_end', $profile->financial_period_end ? $profile->financial_period_end->format('Y-m-d') : '')),
-                fiscalYear: @js(old('fiscal_year', $profile->fiscal_year ?? '')),
                 loadingSubmit: false,
-
-                updateFiscalYear() {
-                    if (this.financialPeriodStart) {
-                        const date = new Date(this.financialPeriodStart);
-                        if (!isNaN(date.getTime())) {
-                            this.fiscalYear = date.getFullYear();
-                        }
-                    }
-                },
 
                 submitForm() {
                     this.loadingSubmit = true;
