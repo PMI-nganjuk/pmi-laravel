@@ -56,24 +56,6 @@ class SettingController extends Controller
 
         return response()->download($filePath, 'Manual_Book_PMI_Nganjuk.pdf');
     }
-
-    /**
-     * Download the manual book (.docx).
-     */
-    public function downloadManualBookWord()
-    {
-        $filePath = public_path('manual-book/Manual_Book_PMI_Nganjuk.docx');
-
-        if (!file_exists($filePath)) {
-            $filePath = base_path('Manual_Book_PMI_Nganjuk.docx');
-        }
-
-        if (!file_exists($filePath)) {
-            abort(404, 'Dokumen manual book Word tidak ditemukan.');
-        }
-
-        return response()->download($filePath, 'Manual_Book_PMI_Nganjuk.docx');
-    }
 }
 
 
