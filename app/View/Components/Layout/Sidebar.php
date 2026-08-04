@@ -91,7 +91,7 @@ class Sidebar extends Component
                 'key'         => 'keuangan',
                 'label'       => 'Input Keuangan',
                 'collapsible' => true,
-                'default_open'=> true,
+                'default_open'=> $isFinanceActive,
                 'items'       => $financeMenu
             ];
         }
@@ -116,7 +116,7 @@ class Sidebar extends Component
                 'active'=> request()->routeIs('balance-sheet.*')
             ],
             [
-                'label' => 'Laporan Alur Kas',
+                'label' => 'Laporan Arus Kas',
                 'route' => 'cash-flow.index',
                 'icon'  => 'chart',
                 'active'=> request()->routeIs('cash-flow.*')
@@ -137,15 +137,7 @@ class Sidebar extends Component
             }
         }
 
-        $sections[] = [
-            'key'         => 'laporan',
-            'label'       => 'Laporan Keuangan',
-            'collapsible' => true,
-            'default_open'=> true,
-            'items'       => $report
-        ];
-
-        // 3. Konfigurasi Sistem (Collapsible)
+        $isSystemActive = false;
         if ($user->hasRole(RoleEnum::ADMIN)) {
             $systemMenu = [
                 [
@@ -168,19 +160,29 @@ class Sidebar extends Component
                 ],
             ];
 
-            $isSystemActive = false;
             foreach ($systemMenu as $item) {
                 if ($item['active']) {
                     $isSystemActive = true;
                     break;
                 }
             }
+        }
 
+        $sections[] = [
+            'key'         => 'laporan',
+            'label'       => 'Laporan Keuangan',
+            'collapsible' => true,
+            'default_open'=> $isReportActive || (!$isFinanceActive && !$isSystemActive),
+            'items'       => $report
+        ];
+
+        // 3. Konfigurasi Sistem (Collapsible)
+        if ($user->hasRole(RoleEnum::ADMIN) && isset($systemMenu)) {
             $sections[] = [
                 'key'         => 'sistem',
                 'label'       => 'Manajemen Organisasi',
                 'collapsible' => true,
-                'default_open'=> true,
+                'default_open'=> $isSystemActive,
                 'items'       => $systemMenu
             ];
         }
