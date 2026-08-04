@@ -168,6 +168,5 @@ Route::middleware('auth')->prefix('profile')->name('profile.')->group(function (
     Route::put('/password', [ProfileController::class, 'updatePassword'])->name('update-password');
 });
 
-// Manual Book download routes
+// Manual Book download route
 Route::middleware('auth')->get('/manual-book/download', [SettingController::class, 'downloadManualBook'])->name('manual-book.download');
-Route::middleware('auth')->get('/manual-book/download-word', [SettingController::class, 'downloadManualBookWord'])->name('manual-book.download-word');
