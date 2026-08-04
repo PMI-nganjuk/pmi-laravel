@@ -1,58 +1,319 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏢 Sistem Informasi Keuangan & Akuntansi PMI Kabupaten Nganjuk
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi berbasis web untuk pengelolaan keuangan, transaksi kas, jurnal penyesuaian, dan penyusunan laporan keuangan otomatis di lingkungan **Palang Merah Indonesia (PMI) Kabupaten Nganjuk**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📌 Daftar Isi
+1. [Tentang Sistem](#-tentang-sistem)
+2. [Fitur Utama](#-fitur-utama)
+3. [Teknologi & Spesifikasi](#-teknologi--spesifikasi)
+4. [Panduan Instalasi & Pengaturan Awal](#-panduan-instalasi--pengaturan-awal)
+5. [Akun Bawaan (Kredensial Default)](#-akun-bawaan-kredensial-default)
+6. [Panduan Pemeliharaan & Maintenance](#-panduan-pemeliharaan--maintenance)
+   - [Pembersihan Cache & Optimalisasi](#1-pembersihan-cache--optimalisasi)
+   - [Manajemen Database & Migrasi](#2-manajemen-database--migrasi)
+   - [Mode Maintenance Server](#3-mode-maintenance-server)
+   - [Prosedur Backup & Restore](#4-prosedur-backup--restore)
+   - [Monitoring Log & Activity Log](#5-monitoring-log--activity-log)
+   - [Penyelesaian Masalah (Troubleshooting)](#6-penyelesaian-masalah-troubleshooting)
+7. [Ringkasan Perintah Penting (Cheat Sheet)](#-ringkasan-perintah-penting-cheat-sheet)
+8. [Struktur Proyek](#-struktur-proyek)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## ℹ️ Tentang Sistem
 
-## Learning Laravel
+Sistem ini dikembangkan khusus untuk mendukung akuntabilitas dan transparansi keuangan di **PMI Kabupaten Nganjuk**. Mengadopsi standar akuntansi nirlaba, aplikasi ini membantu menyusun laporan penerimaan kas, pengeluaran kas, serta laporan keuangan berkala seperti Laba Rugi, Posisi Keuangan (Neraca), Perubahan Aset Netto, dan Arus Kas secara otomatis.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## ✨ Fitur Utama
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- 💰 **Transaksi Kas**:
+  - **Penerimaan Kas (Cash Receipts)**: Pencatatan kas masuk dengan auto-suggest akun & deskripsi.
+  - **Pengeluaran Kas (Cash Disbursements)**: Pencatatan kas keluar dengan penomoran dokumen otomatis (`DocumentNumberService`).
+- 📝 **Jurnal Penyesuaian (Adjusting Entries)**: Fitur penyesuaian pencatatan periode akuntansi.
+- 📖 **Buku Besar (General Ledger)**: Tampilan rinci mutasi debit-kredit per kode akun (COA).
+- 📊 **Laporan Keuangan Otomatis & Export**:
+  - Laporan Laba Rugi (Profit & Loss)
+  - Laporan Posisi Keuangan / Neraca (Balance Sheet)
+  - Laporan Perubahan Aset Netto (Analysis Notes)
+  - Laporan Arus Kas (Cash Flow)
+  - Export data ke format **Excel (.xlsx)** & **PDF**.
+- 🗂️ **Bagan Akun (Chart of Accounts / COA)**: Pengelolaan kategori, subkategori, dan kode akun.
+- 🎯 **Manajemen Program & Profil Organisasi**: Pengelompokan transaksi berdasarkan program PMI.
+- 👥 **Manajemen Pengguna & Role Access (RBAC)**:
+  - **Admin**: Akses penuh ke pengguna, pengaturan sistem, dan laporan.
+  - **Staf Keuangan**: Mengelola transaksi kas, jurnal penyesuaian, dan laporan keuangan.
+  - **Karyawan / Staff**: Akses terbatas sesuai otoritas operasional.
+  - **User / Pengguna Umum**: Akses dasar informasi.
+- 🛡️ **Audit Trail (Activity Log)**: Pelacakan riwayat aktivitas pengguna (Spatie Activitylog).
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## 🛠️ Teknologi & Spesifikasi
+
+- **Backend**: PHP >= 8.3, Laravel Framework 12.x
+- **Frontend**: Blade Templating, Tailwind CSS v4, Alpine.js, Livewire v4
+- **Build Tools**: Vite 8.x
+- **Database**: SQLite (Default lokal) / MySQL / PostgreSQL
+- **Pustaka Utama**:
+  - `maatwebsite/excel` (Export Excel)
+  - `spatie/laravel-activitylog` (Audit Log)
+  - `puppeteer` & `docx` (Pencetakan / Dokumen)
+
+---
+
+## 🚀 Panduan Instalasi & Pengaturan Awal
+
+### 1. Prasyarat Sistem
+Pastikan perangkat server/pengembang telah terpasang:
+- **PHP** >= 8.3 (dengan ekstensi: `pdo`, `mbstring`, `openssl`, `xml`, `curl`, `sqlite3` atau `mysqli`)
+- **Composer** >= 2.x
+- **Node.js** >= 20.x & **NPM**
+
+### 2. Langkah-langkah Instalasi
 
 ```bash
-composer require laravel/boost --dev
+# 1. Clone repositori
+git clone <URL_REPOSITORI>
+cd laravel-pmi-new
 
-php artisan boost:install
+# 2. Install dependensi PHP (Composer)
+composer install
+
+# 3. Install dependensi JavaScript/CSS (Node.js)
+npm install
+
+# 4. Salin file konfigurasi lingkungan (.env)
+cp .env.example .env
+
+# 5. Generate Application Key
+php artisan key:generate
+
+# 6. Konfigurasi Database pada file .env
+# Untuk SQLite (default):
+# pastikan DB_CONNECTION=sqlite di .env dan buat file sqlite kosong jika belum ada:
+# touch database/database.sqlite (di Linux/Mac) atau New-Item database/database.sqlite (di Windows PowerShell)
+
+# 7. Jalankan Migrasi Database beserta Seeder Data Awal
+php artisan migrate --seed
+
+# 8. Buat link simbolis storage
+php artisan storage:link
+
+# 9. Build aset frontend (Environment Pengembangan vs Produksi)
+# Untuk Pengembangan (Hot Reload):
+npm run dev
+
+# Untuk Produksi:
+npm run build
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 3. Menjalankan Server Lokal
 
-## Contributing
+```bash
+php artisan serve
+```
+Buka browser di URL: `http://127.0.0.1:8000`
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 🔑 Akun Bawaan (Kredensial Default)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Setelah menjalankan `php artisan db:seed` atau `migrate --seed`, gunakan kredensial berikut untuk masuk ke sistem:
 
-## Security Vulnerabilities
+| Role | Email | Password | Hak Akses |
+| :--- | :--- | :--- | :--- |
+| **Admin** | `admin@pmi-nganjuk.or.id` | `password` | Kelola Pengguna, Setting, Finance, Laporan |
+| **Staf Keuangan** | `stafkeuangan@pmi-nganjuk.or.id` | `password` | Kelola Transaksi Kas, Jurnal, COA, Laporan |
+| **Karyawan** | `karyawan@pmi-nganjuk.or.id` | `password` | Akses Tingkat Staf / View Dashboard |
+| **Pengguna Umum** | `pengguna@pmi-nganjuk.or.id` | `password` | Akses Dasar Sistem |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+> ⚠️ **PENTING UNTUK PRODUKSI**: Segera ubah password seluruh akun default ini di lingkungan produksi!
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## ⚙️ Panduan Pemeliharaan & Maintenance
+
+Halaman ini berisi petunjuk operasional lengkap bagi **Administrator** dan **Tim IT** untuk merawat, memperbarui, serta memulihkan sistem jika terjadi kendala.
+
+### 1. Pembersihan Cache & Optimalisasi
+
+Cache Laravel dapat menyebabkan perubahan tidak muncul jika tidak dibersihkan saat ada pembaruan kode.
+
+#### A. Pembersihan Cache (Development / Saat Ada Masalah)
+```bash
+# Membersihkan seluruh cache sistem sekaligus
+php artisan optimize:clear
+
+# Atau bersihkan satu per satu:
+php artisan config:clear    # Cache Konfigurasi
+php artisan route:clear     # Cache Routing
+php artisan view:clear      # Cache View Blade
+php artisan cache:clear     # Cache Aplikasi/Session
+```
+
+#### B. Optimalisasi Cache (Wajib Di-run pada Server Produksi)
+```bash
+# Menggabungkan caching konfigurasi, route, dan view untuk kecepatan maksimal
+php artisan optimize
+npm run build
+```
+
+---
+
+### 2. Manajemen Database & Migrasi
+
+#### A. Menjalankan Migrasi Baru (Update Fitur Baru)
+Setiap ada pembaruan kode dari tim pengembang yang menambah tabel/kolom database:
+```bash
+php artisan migrate --force
+```
+
+#### B. Reset Database Ke Kondisi Awal (Development Only)
+> 🚨 **PERHATIAN**: Perintah di bawah ini akan **MENGHAPUS SELURUH DATA** database dan mengisinya kembali dari seeder!
+```bash
+php artisan migrate:fresh --seed
+```
+
+---
+
+### 3. Mode Maintenance Server
+
+Gunakan Mode Maintenance saat sedang melakukan perbaikan besar, pembaruan skema database, atau migrasi server agar pengguna tidak mengakses sistem secara bersamaan.
+
+#### A. Mengaktifkan Mode Maintenance
+```bash
+# Mengunci aplikasi dengan pesan custom dan retry interval
+php artisan down --message="Sistem Keuangan PMI Nganjuk sedang dalam pemeliharaan rutin. Silakan coba beberapa saat lagi." --retry=60
+```
+
+#### B. Mengakses Aplikasi Saat Mode Maintenance (Bypass)
+Jika admin ingin tetap bisa mengakses aplikasi saat maintenance aktif:
+```bash
+php artisan down --secret="pmi-maintenance-pass-2026"
+```
+Admin dapat mengakses aplikasi melalui URL: `http://domain-pmi.or.id/pmi-maintenance-pass-2026` untuk menyimpan cookie bypass.
+
+#### C. Mematikan Mode Maintenance (Aplikasi Kembali Online)
+```bash
+php artisan up
+```
+
+---
+
+### 4. Prosedur Backup & Restore
+
+#### A. Backup Database
+- **SQLite (Default)**:
+  Cukup salin file `database/database.sqlite` ke lokasi aman/cloud storage secara berkala.
+- **MySQL / MariaDB**:
+  ```bash
+  mysqldump -u [username] -p [nama_database] > backup_pmi_$(date +%Y%m%d_%H%M%S).sql
+  ```
+
+#### B. Backup File Upload / Storage
+Salin folder `storage/app/public` dan `storage/app/documents` (jika ada file bukti transfer/dokumen yang diunggah).
+
+#### C. Restore Database
+- **SQLite**: Timpa file `database/database.sqlite` dengan file cadangan.
+- **MySQL / MariaDB**:
+  ```bash
+  mysql -u [username] -p [nama_database] < backup_pmi_filename.sql
+  ```
+
+---
+
+### 5. Monitoring Log & Activity Log
+
+#### A. Log Aplikasi Laravel
+File log utama tersimpan di:
+`storage/logs/laravel.log`
+
+Untuk melihat log secara *realtime* di terminal:
+```bash
+# Menggunakan Laravel Pail (Fitur Laravel 12)
+php artisan pail
+
+# Atau menggunakan perintah tail (Linux/Mac)
+tail -f storage/logs/laravel.log
+```
+
+#### B. Activity Log (Audit Trail User)
+Setiap transaksi penerimaan, pengeluaran, dan perubahan data dicatat otomatis di tabel `activity_log`.
+Admin dapat mengecek aktivitas user melalui menu aplikasi atau kueri database jika diperlukan investigasi audit.
+
+---
+
+### 6. Penyelesaian Masalah (Troubleshooting)
+
+| Gejala Masalah | Penyebab Umum | Solusi / Perbaikan |
+| :--- | :--- | :--- |
+| **Halaman Blank / Error 500** | Permisi folder / Cache crash / `.env` error | 1. Cek `storage/logs/laravel.log`<br>2. Jalankan `php artisan optimize:clear`<br>3. Pastikan `APP_KEY` terisi |
+| **Gagal Upload / Simpan Dokumen** | Folder `storage` tidak writable / symlink putus | 1. Beri akses write: `chmod -R 775 storage bootstrap/cache`<br>2. Buat symlink: `php artisan storage:link` |
+| **Asset CSS/JS Tidak Muat / 404** | Build Vite belum di-run di produksi | Jalankan `npm run build` |
+| **Laporan / Export Excel Gagal** | Ekstensi PHP `zip` / `gd` / `xml` tidak aktif | Pastikan ekstensi `php-zip`, `php-gd`, `php-xml` terpasang dan diaktifkan di `php.ini` |
+| **Login Gagal Terus / CSRF Token Expired** | Session driver / Permission folder session | Jalankan `php artisan config:clear` dan cek permisi folder `storage/framework/sessions` |
+
+---
+
+## 📋 Ringkasan Perintah Penting (Cheat Sheet)
+
+```bash
+# 🛠️ PERINTAH PENGEMBANGAN (DEVELOPMENT)
+php artisan serve                   # Jalankan web server lokal
+npm run dev                         # Jalankan Vite Hot Reload
+
+# 🧹 PERINTAH PEMELIHARAAN CACHE
+php artisan optimize:clear          # Bersihkan semua jenis cache
+php artisan optimize                # Cache ulang untuk kecepatan produksi
+
+# 🗄️ PERINTAH DATABASE
+php artisan migrate                 # Jalankan migrasi baru
+php artisan db:seed                 # Isi data awal/dummy
+php artisan migrate:fresh --seed    # Reset total DB & seeder
+
+# 🚨 PERINTAH MAINTENANCE SERVER
+php artisan down                    # Mode perbaikan (Lock app)
+php artisan up                      # Matikan mode perbaikan (Online)
+
+# 📄 MONITORING LOG
+php artisan pail                    # Stream log interaktif
+```
+
+---
+
+## 📂 Struktur Proyek Utama
+
+```text
+laravel-pmi-new/
+├── app/
+│   ├── Enums/                 # RoleEnum & konstanta enum aplikasi
+│   ├── Exports/               # Class export Excel (Laba Rugi, Neraca, DLL)
+│   ├── Http/
+│   │   ├── Controllers/       # Controller (Kas, Jurnal, COA, Laporan, User)
+│   │   └── Middleware/        # Middleware autentikasi & otoritas
+│   ├── Models/                # Eloquent Models (Transaction, COA, User, dll)
+│   ├── Repositories/          # Query logic & pola repository
+│   └── Services/              # Business logic (CashReceipt, CashDisbursement, Laporan)
+├── database/
+│   ├── factories/             # Factory testing
+│   ├── migrations/            # Skema migrasi database
+│   └── seeders/               # Data seeder awal (COA, User, Financial Report Types)
+├── resources/
+│   ├── views/                 # Blade Templates & Components
+│   └── css / js/              # Tailwind CSS v4 & Alpine.js scripts
+├── routes/
+│   └── web.php                # Rute web utama aplikasi
+├── storage/                   # File log, upload, dan cache framework
+└── vite.config.js             # Konfigurasi Vite asset bundler
+```
+
+---
+
+## 📄 Lisensi & Hak Cipta
+
+Hak Cipta © 2026 **Palang Merah Indonesia (PMI) Kabupaten Nganjuk**. All rights reserved.
+
