@@ -48,7 +48,9 @@ async function capture() {
         { url: 'http://127.0.0.1:8000/cash-flow', filename: 'ss_cash_flow.png', title: 'Laporan Arus Kas' },
         { url: 'http://127.0.0.1:8000/analysis-notes', filename: 'ss_analysis_notes.png', title: 'Laporan Perubahan Aset Netto' },
         { url: 'http://127.0.0.1:8000/dashboard/users', filename: 'ss_users.png', title: 'Manajemen Akun' },
-        { url: 'http://127.0.0.1:8000/dashboard/settings', filename: 'ss_settings.png', title: 'Profil Organisasi' }
+        { url: 'http://127.0.0.1:8000/dashboard/settings', filename: 'ss_settings.png', title: 'Profil Organisasi' },
+        { url: 'http://127.0.0.1:8000/programs', filename: 'ss_programs.png', title: 'Program Kerja' },
+        { url: 'http://127.0.0.1:8000/profile', filename: 'ss_profile.png', title: 'Profil Saya' }
     ];
 
     for (const target of pagesToCapture) {
