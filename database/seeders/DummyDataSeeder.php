@@ -58,13 +58,13 @@ class DummyDataSeeder extends Seeder
         $this->command->info('5 Program berhasil dibuat.');
 
         // Pastikan COA terisi dengan benar (Pastikan db:seed --class=ChartOfAccountSeeder dijalankan)
-        $coaKas = ChartOfAccount::where('id', '11002-00')->first(); // Bank Mandiri
+        $coaKas = ChartOfAccount::where('id', '12051-00')->first(); // Bank Mandiri
         $coaPendapatan = ChartOfAccount::where('id', '51001-00')->first(); // Sumbangan Institusi
         $coaBebanProgram = ChartOfAccount::where('id', '61001-00')->first(); // Bantuan Dana
         $coaBebanManajemen = ChartOfAccount::where('id', '72001-00')->first(); // Gaji
-        $coaAsetTetap = ChartOfAccount::where('id', '13001-00')->first(); // Inventaris Kantor
-        $coaAsetNetto = ChartOfAccount::where('id', '31001-00')->first(); // Aset Netto Tidak Terikat
-        $coaHutang = ChartOfAccount::where('id', '21001-00')->first(); // Hutang Bank
+        $coaAsetTetap = ChartOfAccount::where('id', '22021-00')->first(); // Inventaris Kantor
+        $coaAsetNetto = ChartOfAccount::where('id', '41001-00')->first(); // Aset Netto Tidak Terikat
+        $coaHutang = ChartOfAccount::where('id', '31011-00')->first(); // Hutang Bank
 
         if (!$coaKas || !$coaPendapatan || !$coaAsetNetto) {
             $this->command->error('Chart of Account tidak lengkap. Jalankan dulu seeder COA: php artisan db:seed --class=ChartOfAccountSeeder');

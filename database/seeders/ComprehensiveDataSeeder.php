@@ -65,16 +65,23 @@ class ComprehensiveDataSeeder extends Seeder
         $this->command->info('Program Kerja berhasil disetup.');
 
         // 3. Ambil COA Utama (Neraca)
-        $coaKas = ChartOfAccount::where('id', '11002-00')->first(); // Bank Mandiri
-        $coaKasKecil = ChartOfAccount::where('id', '11001-00')->first(); // Kas Kecil
-        $coaPiutang = ChartOfAccount::where('id', '12001-00')->first(); // Piutang
-        $coaAsetTetap = ChartOfAccount::where('id', '13001-00')->first(); // Inventaris Kantor
+        $coaKas = ChartOfAccount::where('id', '12051-00')->first(); // Bank Mandiri
+        $coaKasKecil = ChartOfAccount::where('id', '11011-00')->first(); // Kas - Markas (Pengganti Kas Kecil)
+        $coaPiutang = ChartOfAccount::where('id', '13231-00')->first(); // Piutang Karyawan
+        $coaAsetTetap = ChartOfAccount::where('id', '22021-00')->first(); // Inventaris Kantor
         
-        $coaHutang = ChartOfAccount::where('id', '21001-00')->first(); // Hutang Bank
-        $coaHutangLain = ChartOfAccount::where('id', '22001-00')->first(); // Hutang Pihak Ketiga
+        $coaHutang = ChartOfAccount::where('id', '31011-00')->first(); // Hutang Bank
+        $coaHutangLain = ChartOfAccount::where('id', '32131-00')->first(); // Hutang Pihak Ketiga
         
-        $coaAsetNetto = ChartOfAccount::where('id', '31001-00')->first(); // Aset Netto Tidak Terikat
-        $coaAsetNettoTerikat = ChartOfAccount::where('id', '32001-00')->first(); // Aset Netto Terikat
+        $coaAsetNetto = ChartOfAccount::where('id', '41001-00')->first(); // Aset Netto Tidak Terikat
+        $coaAsetNettoTerikat = ChartOfAccount::where('id', '43001-00')->first(); // Aset Netto Terikat
+        
+        // COA Tambahan untuk variasi Neraca
+        $coaPersediaan = ChartOfAccount::where('id', '14021-00')->first(); // Persediaan BHP
+        $coaUangMuka = ChartOfAccount::where('id', '15011-00')->first(); // Persekot Kegiatan
+        $coaBiayaDimuka = ChartOfAccount::where('id', '16001-00')->first(); // Biaya Dibayar Di Muka
+        $coaHutangPajak = ChartOfAccount::where('id', '33001-00')->first(); // Hutang Pajak
+        $coaBiayaYMH = ChartOfAccount::where('id', '34011-00')->first(); // Accrued Gaji
 
         // Ambil SEMUA COA Pendapatan (5xxxx) dan Beban (6xxxx, 7xxxx)
         $pendapatanCoas = ChartOfAccount::where('id', 'like', '5%')->get();
@@ -138,6 +145,12 @@ class ComprehensiveDataSeeder extends Seeder
                 $buatTransaksi('PENGELUARAN', $coaAsetTetap->id, $coaKas->id, $faker->randomFloat(0, 10000000, 50000000), 'Pembelian Aset Tetap Tambahan', "{$year}-03-10");
                 $buatTransaksi('PEMASUKAN', $coaKas->id, $coaHutang->id, $faker->randomFloat(0, 50000000, 100000000), 'Penerimaan Hutang Bank', "{$year}-05-15");
                 $buatTransaksi('PENGELUARAN', $coaPiutang->id, $coaKas->id, $faker->randomFloat(0, 2000000, 5000000), 'Pemberian Pinjaman Karyawan', "{$year}-07-20");
+                
+                if ($coaPersediaan) $buatTransaksi('PENGELUARAN', $coaPersediaan->id, $coaKas->id, 5000000, 'Pembelian Persediaan BHP', "{$year}-02-10");
+                if ($coaUangMuka) $buatTransaksi('PENGELUARAN', $coaUangMuka->id, $coaKas->id, 2000000, 'Uang Muka Kegiatan', "{$year}-04-12");
+                if ($coaBiayaDimuka) $buatTransaksi('PENGELUARAN', $coaBiayaDimuka->id, $coaKas->id, 12000000, 'Sewa Dibayar Di Muka', "{$year}-01-05");
+                if ($coaHutangPajak) $buatTransaksi('PENYESUAIAN', '72081-00', $coaHutangPajak->id, 1500000, 'Pencatatan Hutang Pajak', "{$year}-12-31", 'ADJUSTMENT');
+                if ($coaBiayaYMH) $buatTransaksi('PENYESUAIAN', '72001-00', $coaBiayaYMH->id, 8000000, 'Accrued Gaji Karyawan', "{$year}-12-31", 'ADJUSTMENT');
 
                 for ($month = 1; $month <= 12; $month++) {
                     $monthStr = str_pad($month, 2, '0', STR_PAD_LEFT);
@@ -172,7 +185,7 @@ class ComprehensiveDataSeeder extends Seeder
 
                 // Jurnal Penyesuaian Akhir Tahun (Penyusutan, Pemindahan ke Aset Terikat dll)
                 $coaPenyusutan = ChartOfAccount::where('id', '71001-00')->first();
-                $coaAkumPenyusutan = ChartOfAccount::where('id', '13002-00')->first() ?? $coaAsetTetap;
+                $coaAkumPenyusutan = ChartOfAccount::where('id', '23021-00')->first() ?? $coaAsetTetap;
                 if ($coaPenyusutan) {
                     $buatTransaksi('PENYESUAIAN', $coaPenyusutan->id, $coaAkumPenyusutan->id, 30000000, "Jurnal Penyesuaian Penyusutan Tahun {$year}", "{$year}-12-31", 'ADJUSTMENT');
                 }

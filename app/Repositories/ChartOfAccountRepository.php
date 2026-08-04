@@ -106,8 +106,7 @@ class ChartOfAccountRepository
             now()->addHour(),
             fn () => ChartOfAccount::with('accountSubcategory')
                 ->whereHas('accountSubcategory', function ($q) {
-                    $q->where('id', '<=', 2)
-                      ->where('account_category_id', 1);
+                    $q->whereIn('name', ['Kas', 'Bank']);
                 })
                 ->orderBy('id')
                 ->get(['id', 'account_name'])
@@ -123,7 +122,10 @@ class ChartOfAccountRepository
         $raw = Cache::remember(
             'coa.transaction_accounts',
             now()->addHour(),
-            fn () => ChartOfAccount::orderBy('id')
+            fn () => ChartOfAccount::whereDoesntHave('accountSubcategory', function ($q) {
+                    $q->whereIn('name', ['Kas', 'Bank']);
+                })
+                ->orderBy('id')
                 ->get(['id', 'account_name'])
                 ->map(fn($coa) => $coa->getAttributes())
                 ->toArray()
