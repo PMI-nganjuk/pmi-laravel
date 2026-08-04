@@ -79,9 +79,102 @@
                     :endpoint="route('disbursements.index')"
                     default-sort="transaction_date"
                     default-dir="desc"
-                    :filters="['search' => '']"
+                    :filters="[
+                        'search' => '',
+                        'per_page' => '15',
+                        'filter_tanggal' => '',
+                        'filter_no_dokumen' => '',
+                        'filter_program' => '',
+                        'filter_pic' => '',
+                        'filter_coa' => '',
+                        'filter_nominal' => '',
+                        'filter_keterangan' => ''
+                    ]"
                 >
                     <x-molecules.datatable-filters placeholder="Cari nomor dokumen, keterangan...">
+                        <div x-data="{ showAdvancedFilter: false }" class="flex items-center gap-2 relative">
+                            <x-atoms.button type="button" variant="outline" size="md" @click="showAdvancedFilter = !showAdvancedFilter">
+                                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                </svg>
+                                Filter
+                            </x-atoms.button>
+
+                            <!-- Modal Overlay -->
+                            <div x-show="showAdvancedFilter" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center">
+                                <!-- Backdrop -->
+                                <div class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm"
+                                     @click="showAdvancedFilter = false"
+                                     x-transition.opacity>
+                                </div>
+
+                                <!-- Modal Content -->
+                                <div class="relative bg-surface-base border border-surface-border rounded-xl shadow-2xl w-[64rem] max-w-[95vw] p-6 flex flex-col gap-6"
+                                     x-transition.scale.origin.center>
+                                    <h4 class="font-bold text-lg text-content-base border-b border-surface-border pb-3">Filter Lanjutan</h4>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                        <div>
+                                            <label class="text-xs font-medium text-content-base mb-1 block">Tanggal</label>
+                                            <x-atoms.input type="date" x-model="filters.filter_tanggal" @keydown.enter.prevent="fetchData(); showAdvancedFilter = false" class="w-full text-sm" />
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-medium text-content-base mb-1 block">No. Dokumen</label>
+                                            <x-atoms.input type="text" x-model="filters.filter_no_dokumen" @keydown.enter.prevent="fetchData(); showAdvancedFilter = false" class="w-full text-sm" placeholder="Cari No. Dokumen" />
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-medium text-content-base mb-1 block">Program Kerja</label>
+                                            <select x-model="filters.filter_program" class="w-full text-sm border-surface-border rounded-lg bg-surface-base focus:ring-primary focus:border-primary">
+                                                <option value="">Semua Program</option>
+                                                @foreach($programs as $program)
+                                                    <option value="{{ $program->name }}">{{ $program->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-medium text-content-base mb-1 block">Dibayarkan Kepada</label>
+                                            <select x-model="filters.filter_pic" class="w-full text-sm border-surface-border rounded-lg bg-surface-base focus:ring-primary focus:border-primary">
+                                                <option value="">Semua User</option>
+                                                @foreach($users as $user)
+                                                    <option value="{{ $user->name }}">{{ $user->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-medium text-content-base mb-1 block">Rekening Kas / Kode Transaksi</label>
+                                            <x-atoms.input type="text" x-model="filters.filter_coa" @keydown.enter.prevent="fetchData(); showAdvancedFilter = false" class="w-full text-sm" placeholder="Cari COA" />
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-medium text-content-base mb-1 block">Nominal</label>
+                                            <x-atoms.input type="text" x-model="filters.filter_nominal" @keydown.enter.prevent="fetchData(); showAdvancedFilter = false" class="w-full text-sm" placeholder="Nominal" />
+                                        </div>
+                                        <div class="col-span-1 md:col-span-2 lg:col-span-2">
+                                            <label class="text-xs font-medium text-content-base mb-1 block">Keterangan</label>
+                                            <x-atoms.input type="text" x-model="filters.filter_keterangan" @keydown.enter.prevent="fetchData(); showAdvancedFilter = false" class="w-full text-sm" placeholder="Cari Keterangan" />
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-end gap-3 mt-2 pt-4 border-t border-surface-border">
+                                        <x-atoms.button type="button" variant="outline" size="sm" @click="showAdvancedFilter = false">
+                                            Batal
+                                        </x-atoms.button>
+                                        <x-atoms.button type="button" variant="info" size="sm" @click="fetchData(); showAdvancedFilter = false">
+                                            Cari
+                                        </x-atoms.button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2 ml-4 border-l border-surface-border pl-4">
+                                <label for="per_page" class="text-sm font-medium text-content-base whitespace-nowrap">Tampilkan:</label>
+                                <select id="per_page" x-model="filters.per_page" @change="fetchData()" class="text-sm border-surface-border rounded-lg bg-surface-base focus:ring-primary focus:border-primary">
+                                    <option value="5">5 data</option>
+                                    <option value="10">10 data</option>
+                                    <option value="15">15 data</option>
+                                    <option value="25">25 data</option>
+                                    <option value="-1">Semua Data</option>
+                                </select>
+                            </div>
+                        </div>
                     </x-molecules.datatable-filters>
 
                     <div id="data-container">

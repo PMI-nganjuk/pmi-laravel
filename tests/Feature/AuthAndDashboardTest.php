@@ -72,17 +72,17 @@ class AuthAndDashboardTest extends TestCase
         $response->assertSee('Audit Akses RBAC'); // Admin specific action
     }
 
-    public function test_financial_manager_sees_financial_stats_and_actions(): void
+    public function test_finance_staff_sees_financial_stats_and_actions(): void
     {
-        $user = User::where('email', 'manager@pmi-nganjuk.or.id')->first();
+        $user = User::where('email', 'stafkeuangan@pmi-nganjuk.or.id')->first();
 
         $response = $this->actingAs($user)->get('/dashboard');
 
         $response->assertStatus(200);
-        $response->assertSee('Selamat Datang Kembali, Manager Keuangan PMI');
-        $response->assertSee('Manager keuangan'); // Role badge
+        $response->assertSee('Selamat Datang Kembali, Staf Keuangan PMI');
+        $response->assertSee('Staf Keuangan'); // Role badge
         $response->assertSee('Total Saldo Kas'); // Financial stat
-        $response->assertSee('Persetujuan Pencairan Kas'); // Financial manager action
+        $response->assertSee('Pencatatan Jurnal Baru'); // Finance staff action
     }
 
     public function test_user_can_logout(): void

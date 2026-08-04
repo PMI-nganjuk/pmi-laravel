@@ -13,19 +13,12 @@ class RoleAndPermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create demo users with their respective roles
         $users = [
             [
                 'name' => 'Admin PMI',
                 'email' => 'admin@pmi-nganjuk.or.id',
                 'password' => 'password',
                 'role' => RoleEnum::ADMIN,
-            ],
-            [
-                'name' => 'Manager Keuangan PMI',
-                'email' => 'manager@pmi-nganjuk.or.id',
-                'password' => 'password',
-                'role' => RoleEnum::FINANCIAL_MANAGER,
             ],
             [
                 'name' => 'Staf Keuangan PMI',

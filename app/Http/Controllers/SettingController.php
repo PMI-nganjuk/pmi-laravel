@@ -38,4 +38,25 @@ class SettingController extends Controller
         return redirect()->route('settings.index')
             ->with('success', 'Profil organisasi berhasil diperbarui.');
     }
+
+    /**
+     * Download the manual book (.pdf).
+     */
+    public function downloadManualBook()
+    {
+        $filePath = public_path('manual-book/Manual_Book_PMI_Nganjuk.pdf');
+
+        if (!file_exists($filePath)) {
+            $filePath = base_path('Manual_Book_PMI_Nganjuk.pdf');
+        }
+
+        if (!file_exists($filePath)) {
+            abort(404, 'Dokumen manual book tidak ditemukan.');
+        }
+
+        return response()->download($filePath, 'Manual_Book_PMI_Nganjuk.pdf');
+    }
 }
+
+
+

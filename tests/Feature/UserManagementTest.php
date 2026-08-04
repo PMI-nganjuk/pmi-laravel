@@ -36,7 +36,7 @@ class UserManagementTest extends TestCase
 
     public function test_non_admin_cannot_access_user_management(): void
     {
-        $nonAdmin = User::where('email', 'manager@pmi-nganjuk.or.id')->first();
+        $nonAdmin = User::where('email', 'karyawan@pmi-nganjuk.or.id')->first();
 
         $response1 = $this->actingAs($nonAdmin)->get('/dashboard/users');
         $response1->assertStatus(403);
@@ -109,12 +109,12 @@ class UserManagementTest extends TestCase
     public function test_admin_can_update_user_without_password(): void
     {
         $admin = User::where('email', 'admin@pmi-nganjuk.or.id')->first();
-        $targetUser = User::where('email', 'manager@pmi-nganjuk.or.id')->first();
+        $targetUser = User::where('email', 'stafkeuangan@pmi-nganjuk.or.id')->first();
 
         $response = $this->actingAs($admin)->put("/dashboard/users/{$targetUser->id}", [
-            'name' => 'Updated Manager Name',
-            'email' => 'manager-updated@pmi-nganjuk.or.id',
-            'role' => RoleEnum::FINANCIAL_MANAGER->value,
+            'name' => 'Updated Staf Name',
+            'email' => 'staf-updated@pmi-nganjuk.or.id',
+            'role' => RoleEnum::FINANCE_STAFF->value,
             'password' => '', // blank password should not change it
         ]);
 
@@ -123,8 +123,8 @@ class UserManagementTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'id' => $targetUser->id,
-            'name' => 'Updated Manager Name',
-            'email' => 'manager-updated@pmi-nganjuk.or.id',
+            'name' => 'Updated Staf Name',
+            'email' => 'staf-updated@pmi-nganjuk.or.id',
         ]);
     }
 
@@ -134,12 +134,12 @@ class UserManagementTest extends TestCase
     public function test_admin_can_update_user_with_new_password(): void
     {
         $admin = User::where('email', 'admin@pmi-nganjuk.or.id')->first();
-        $targetUser = User::where('email', 'manager@pmi-nganjuk.or.id')->first();
+        $targetUser = User::where('email', 'stafkeuangan@pmi-nganjuk.or.id')->first();
 
         $response = $this->actingAs($admin)->put("/dashboard/users/{$targetUser->id}", [
-            'name' => 'Manager Name Updated Again',
-            'email' => 'manager-updated-again@pmi-nganjuk.or.id',
-            'role' => RoleEnum::FINANCIAL_MANAGER->value,
+            'name' => 'Staf Name Updated Again',
+            'email' => 'staf-updated-again@pmi-nganjuk.or.id',
+            'role' => RoleEnum::FINANCE_STAFF->value,
             'password' => 'newbrandnewpassword123',
         ]);
 
@@ -156,7 +156,7 @@ class UserManagementTest extends TestCase
     public function test_admin_update_validation(): void
     {
         $admin = User::where('email', 'admin@pmi-nganjuk.or.id')->first();
-        $targetUser = User::where('email', 'manager@pmi-nganjuk.or.id')->first();
+        $targetUser = User::where('email', 'stafkeuangan@pmi-nganjuk.or.id')->first();
 
         $response = $this->actingAs($admin)->put("/dashboard/users/{$targetUser->id}", [
             'name' => '', // invalid
@@ -174,7 +174,7 @@ class UserManagementTest extends TestCase
     public function test_admin_can_delete_other_user(): void
     {
         $admin = User::where('email', 'admin@pmi-nganjuk.or.id')->first();
-        $targetUser = User::where('email', 'manager@pmi-nganjuk.or.id')->first();
+        $targetUser = User::where('email', 'stafkeuangan@pmi-nganjuk.or.id')->first();
 
         $response = $this->actingAs($admin)->delete("/dashboard/users/{$targetUser->id}");
 
@@ -241,16 +241,15 @@ class UserManagementTest extends TestCase
     {
         $admin = User::where('email', 'admin@pmi-nganjuk.or.id')->first();
 
-        // There should be a Financial Manager and Finance Staff seeded
-        $response1 = $this->actingAs($admin)->get('/dashboard/users?role=' . urlencode(RoleEnum::FINANCIAL_MANAGER->value));
+        $response1 = $this->actingAs($admin)->get('/dashboard/users?role=' . urlencode(RoleEnum::FINANCE_STAFF->value));
         $response1->assertStatus(200);
-        $response1->assertSee('manager@pmi-nganjuk.or.id');
+        $response1->assertSee('stafkeuangan@pmi-nganjuk.or.id');
         $response1->assertDontSee('karyawan@pmi-nganjuk.or.id');
 
         $response2 = $this->actingAs($admin)->get('/dashboard/users?role=' . urlencode(RoleEnum::STAFF->value));
         $response2->assertStatus(200);
         $response2->assertSee('karyawan@pmi-nganjuk.or.id');
-        $response2->assertDontSee('manager@pmi-nganjuk.or.id');
+        $response2->assertDontSee('stafkeuangan@pmi-nganjuk.or.id');
     }
 
     /**

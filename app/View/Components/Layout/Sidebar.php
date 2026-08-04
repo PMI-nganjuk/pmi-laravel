@@ -33,6 +33,12 @@ class Sidebar extends Component
                 'icon'  => 'home',
                 'active'=> request()->routeIs('dashboard')
             ],
+            [
+                'label' => 'Manual Book',
+                'route' => 'manual-book.download',
+                'icon'  => 'document',
+                'active'=> false
+            ],
         ];
 
         $sections[] = [
@@ -44,7 +50,7 @@ class Sidebar extends Component
         ];
 
         // 2. Keuangan (Collapsible)
-        if ($user->hasAnyRole([RoleEnum::ADMIN, RoleEnum::FINANCIAL_MANAGER, RoleEnum::FINANCE_STAFF])) {
+        if ($user->hasAnyRole([RoleEnum::ADMIN, RoleEnum::FINANCE_STAFF])) {
             $financeMenu = [
                 [
                     'label' => 'Penerimaan Kas',
@@ -110,16 +116,16 @@ class Sidebar extends Component
                 'active'=> request()->routeIs('balance-sheet.*')
             ],
             [
-                'label' => 'Jurnal Keuangan',
-                'route' => 'finance.journal',
-                'icon'  => 'document',
-                'active'=> request()->routeIs('finance.journal')
+                'label' => 'Laporan Alur Kas',
+                'route' => 'cash-flow.index',
+                'icon'  => 'chart',
+                'active'=> request()->routeIs('cash-flow.*')
             ],
             [
-                'label' => 'Laporan Finansial',
-                'route' => 'finance.reports',
+                'label' => 'Laporan Perubahan Aset Netto',
+                'route' => 'analysis-notes.index',
                 'icon'  => 'chart',
-                'active'=> request()->routeIs('finance.reports')
+                'active'=> request()->routeIs('analysis-notes.*')
             ],
         ];
 

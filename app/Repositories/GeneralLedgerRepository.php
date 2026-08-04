@@ -17,6 +17,11 @@ class GeneralLedgerRepository
 
     public function getPaginated(array $filters = [], int $perPage = 25): LengthAwarePaginator
     {
+        $perPage = (int) ($filters['per_page'] ?? $perPage);
+        // allow "all" option if per_page is -1 or very large, but usually paginate handles it if we pass a large number
+        if ($perPage === -1) {
+            $perPage = 999999999;
+        }
         $query = GeneralLedger::query()
             ->join('transactions', 'general_ledgers.transaction_id', '=', 'transactions.id')
             ->select('general_ledgers.*')
@@ -51,6 +56,52 @@ class GeneralLedgerRepository
                       $qu->where('name', 'like', "%{$search}%");
                   });
             });
+        }
+
+        if (!empty($filters['filter_tanggal'])) {
+            $query->where('transactions.transaction_date', 'like', '%' . $filters['filter_tanggal'] . '%');
+        }
+        if (!empty($filters['filter_no_dokumen'])) {
+            $query->where('transactions.document_number', 'like', '%' . $filters['filter_no_dokumen'] . '%');
+        }
+        if (!empty($filters['filter_program'])) {
+            $query->whereHas('transaction.program', function ($q) use ($filters) {
+                $q->where('name', 'like', '%' . $filters['filter_program'] . '%');
+            });
+        }
+        if (!empty($filters['filter_referensi'])) {
+            $query->where('transactions.reference', 'like', '%' . $filters['filter_referensi'] . '%');
+        }
+        if (!empty($filters['filter_coa'])) {
+            $query->whereHas('chartOfAccount', function ($q) use ($filters) {
+                $q->where('account_name', 'like', '%' . $filters['filter_coa'] . '%')
+                  ->orWhere('id', 'like', '%' . $filters['filter_coa'] . '%');
+            });
+        }
+        if (!empty($filters['filter_debit'])) {
+            $query->where('general_ledgers.debit', 'like', '%' . $filters['filter_debit'] . '%');
+        }
+        if (!empty($filters['filter_kredit'])) {
+            $query->where('general_ledgers.credit', 'like', '%' . $filters['filter_kredit'] . '%');
+        }
+        if (!empty($filters['filter_keterangan'])) {
+            $query->where('transactions.description', 'like', '%' . $filters['filter_keterangan'] . '%');
+        }
+        if (!empty($filters['filter_pic'])) {
+            $query->whereHas('transaction.user', function ($q) use ($filters) {
+                $q->where('name', 'like', '%' . $filters['filter_pic'] . '%');
+            });
+        }
+        if (!empty($filters['filter_bs'])) {
+            // BS Impact = debit - credit
+            $query->whereRaw('(general_ledgers.debit - general_ledgers.credit) LIKE ?', ['%' . $filters['filter_bs'] . '%']);
+        }
+        if (!empty($filters['filter_pl'])) {
+            // PL Impact = credit - debit
+            $query->whereRaw('(general_ledgers.credit - general_ledgers.debit) LIKE ?', ['%' . $filters['filter_pl'] . '%']);
+        }
+        if (!empty($filters['filter_note'])) {
+            $query->where('general_ledgers.note', 'like', '%' . $filters['filter_note'] . '%');
         }
 
         $sortBy = $filters['sort_by'] ?? 'transaction_date';

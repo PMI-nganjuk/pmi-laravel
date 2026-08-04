@@ -11,6 +11,11 @@ class OrganizationProfileRepository
      */
     public function firstOrCreate(): OrganizationProfile
     {
+        $profile = OrganizationProfile::orderBy('fiscal_year', 'desc')->first();
+        if ($profile) {
+            return $profile;
+        }
+
         return OrganizationProfile::firstOrCreate(
             ['id' => 1],
             [

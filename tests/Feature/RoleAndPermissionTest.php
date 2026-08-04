@@ -26,10 +26,6 @@ class RoleAndPermissionTest extends TestCase
         $this->assertNotNull($admin);
         $this->assertTrue($admin->hasRole(RoleEnum::ADMIN));
 
-        $manager = User::where('email', 'manager@pmi-nganjuk.or.id')->first();
-        $this->assertNotNull($manager);
-        $this->assertTrue($manager->hasRole(RoleEnum::FINANCIAL_MANAGER));
-
         $stafKeuangan = User::where('email', 'stafkeuangan@pmi-nganjuk.or.id')->first();
         $this->assertNotNull($stafKeuangan);
         $this->assertTrue($stafKeuangan->hasRole(RoleEnum::FINANCE_STAFF));
@@ -50,7 +46,6 @@ class RoleAndPermissionTest extends TestCase
         $karyawan = User::where('email', 'karyawan@pmi-nganjuk.or.id')->first();
         $this->assertTrue($karyawan->hasAnyRole([RoleEnum::STAFF, RoleEnum::ADMIN]));
         $this->assertTrue($karyawan->hasAnyRole([RoleEnum::USER, RoleEnum::ADMIN])); // can check by equivalent USER role
-        $this->assertFalse($karyawan->hasAnyRole([RoleEnum::ADMIN, RoleEnum::FINANCIAL_MANAGER]));
     }
 
     public function test_admin_bypasses_all_gate_permission_checks(): void
@@ -69,7 +64,6 @@ class RoleAndPermissionTest extends TestCase
     {
         $expectedRoles = [
             'Admin',
-            'Manager keuangan',
             'Staf Keuangan',
             'Karyawan',
             'Pengguna Umum',
@@ -77,7 +71,6 @@ class RoleAndPermissionTest extends TestCase
 
         $this->assertEquals($expectedRoles, User::getRoles());
         $this->assertEquals('Admin', User::ROLE_ADMIN);
-        $this->assertEquals('Manager keuangan', User::ROLE_MANAGER_KEUANGAN);
         $this->assertEquals('Staf Keuangan', User::ROLE_STAF_KEUANGAN);
         $this->assertEquals('Karyawan', User::ROLE_KARYAWAN);
         $this->assertEquals('Pengguna Umum', User::ROLE_PENGGUNA);

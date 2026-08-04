@@ -39,7 +39,7 @@
                         </div>
                     @endif
 
-                    @if($user->hasAnyRole([\App\Enums\RoleEnum::FINANCIAL_MANAGER, \App\Enums\RoleEnum::FINANCE_STAFF]))
+                    @if($user->hasRole(\App\Enums\RoleEnum::FINANCE_STAFF))
                         <!-- Financial Stats -->
                         <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex flex-col justify-between">
                             <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Saldo Kas</span>
@@ -90,101 +90,64 @@
                     @endif
                 </div>
 
-                <!-- Role specific actions & details (Grid Layout) -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Action List -->
-                    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center">
-                            <svg class="h-5 w-5 mr-2 text-red-650" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Tindakan Cepat & Alur Kerja
-                        </h3>
-                        
-                        <div class="space-y-3">
-                            @if($user->hasRole(\App\Enums\RoleEnum::ADMIN))
-                                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-                                    <div>
-                                        <span class="text-sm font-bold text-slate-900 block">Audit Akses RBAC</span>
-                                        <span class="text-xs text-slate-500">Verifikasi lisensi, akses log, dan otorisasi peran</span>
-                                    </div>
-                                    <button class="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-xs font-bold rounded-lg text-white transition">Mulai</button>
+                <!-- Financial Progress Chart & Telemetry (Grid Layout) -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Graph Chart Panel (2 cols on large screen) -->
+                    <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-900">
+                                        Grafik Perkembangan Keuangan
+                                    </h3>
+                                    <p class="text-xs text-slate-500 mt-0.5">Tren Penerimaan Kas vs Pengeluaran Kas (6 Bulan Terakhir)</p>
                                 </div>
-                                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-                                    <div>
-                                        <span class="text-sm font-bold text-slate-900 block">Cadangkan Database</span>
-                                        <span class="text-xs text-slate-500">Buat cadangan data instan dan unduh salinan SQLite</span>
-                                    </div>
-                                    <button class="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-xs font-bold rounded-lg text-slate-700 transition">Jalankan</button>
+                                <div class="flex items-center gap-3 text-xs font-semibold">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Penerimaan
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200">
+                                        <span class="w-2 h-2 rounded-full bg-red-500"></span> Pengeluaran
+                                    </span>
                                 </div>
-                            @endif
+                            </div>
 
-                            @if($user->role === \App\Enums\RoleEnum::FINANCIAL_MANAGER)
-                                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-                                    <div>
-                                        <span class="text-sm font-bold text-slate-900 block">Persetujuan Pencairan Kas</span>
-                                        <span class="text-xs text-slate-500">Ada {{ $stats['pending_approvals'] }} pengajuan pengeluaran kas yang butuh validasi</span>
-                                    </div>
-                                    <button class="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-xs font-bold rounded-lg text-white transition">Periksa</button>
-                                </div>
-                            @endif
+                            <!-- Canvas Chart Container -->
+                            <div class="relative w-full h-72">
+                                <canvas id="financialTrendChart"></canvas>
+                            </div>
+                        </div>
 
-                            @if($user->hasAnyRole([\App\Enums\RoleEnum::FINANCIAL_MANAGER, \App\Enums\RoleEnum::FINANCE_STAFF]))
-                                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-                                    <div>
-                                        <span class="text-sm font-bold text-slate-900 block">Pencatatan Jurnal Baru</span>
-                                        <span class="text-xs text-slate-500">Catat transaksi kas masuk atau kas keluar terkini</span>
-                                    </div>
-                                    <button class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-xs font-bold rounded-lg text-white transition">Input Jurnal</button>
-                                </div>
-                            @endif
-
-                            @if($user->hasRole(\App\Enums\RoleEnum::STAFF) || $user->hasRole(\App\Enums\RoleEnum::USER))
-                                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-                                    <div>
-                                        <span class="text-sm font-bold text-slate-900 block">Kirim Laporan Harian</span>
-                                        <span class="text-xs text-slate-500">Laporkan capaian kegiatan operasional hari ini</span>
-                                    </div>
-                                    <button class="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-xs font-bold rounded-lg text-white transition">Buat Laporan</button>
-                                </div>
-                                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-                                    <div>
-                                        <span class="text-sm font-bold text-slate-900 block">Lihat Log Aktivitas Pribadi</span>
-                                        <span class="text-xs text-slate-500">Pantau riwayat aksi login dan modifikasi data pribadi</span>
-                                    </div>
-                                    <button class="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-xs font-bold rounded-lg text-slate-700 transition">Lihat</button>
-                                </div>
-                            @endif
+                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                            <span>Data otomatis diperbarui dari entri transaksi kas</span>
+                            <a href="{{ route('manual-book.download') }}" target="_blank" class="inline-flex items-center gap-1 text-red-600 hover:text-red-700 font-bold">
+                                Unduh Manual Book (PDF)
+                            </a>
                         </div>
                     </div>
 
-                    <!-- Role Behavior Telemetry description -->
+                    <!-- Role Behavior Telemetry description (1 col) -->
                     <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
                         <div>
-                            <h3 class="text-lg font-bold text-slate-900 mb-3 flex items-center">
-                                <img src="{{ asset('images/logo.png') }}" alt="Logo PMI" class="h-5 w-5 mr-2 object-contain" />
+                            <h3 class="text-lg font-bold text-slate-900 mb-3">
                                 Hak Akses Otoritas Peran
                             </h3>
                             <p class="text-slate-500 text-sm leading-relaxed mb-4">
                                 Berdasarkan logika RBAC terpusat, sistem membagi wewenang peran Anda menjadi skenario berikut:
                             </p>
                             
-                            <ul class="space-y-2.5 text-xs">
-                                <li class="flex items-start gap-2">
-                                    <span class="h-1.5 w-1.5 bg-red-500 rounded-full mt-1.5 shrink-0"></span>
-                                    <span class="text-slate-700"><strong>Administrator (Admin):</strong> Memiliki bypass penuh pada seluruh pemeriksaan gerbang otorisasi.</span>
+                            <ul class="space-y-3 text-xs">
+                                <li class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                                    <span class="h-2 w-2 bg-red-500 rounded-full mt-1 shrink-0"></span>
+                                    <span class="text-slate-700"><strong>Administrator (Admin):</strong> Memiliki bypass penuh pada seluruh pemeriksaan gerbang otorisasi & manajemen sistem.</span>
                                 </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="h-1.5 w-1.5 bg-purple-500 rounded-full mt-1.5 shrink-0"></span>
-                                    <span class="text-slate-700"><strong>Manager Keuangan:</strong> Berwenang memvalidasi pengeluaran kas dan memeriksa seluruh laporan keuangan bulanan.</span>
+                                <li class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                                    <span class="h-2 w-2 bg-blue-500 rounded-full mt-1 shrink-0"></span>
+                                    <span class="text-slate-700"><strong>Staf Keuangan:</strong> Dapat memasukkan catatan transaksi kas baru & jurnal penyesuaian.</span>
                                 </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="h-1.5 w-1.5 bg-blue-500 rounded-full mt-1.5 shrink-0"></span>
-                                    <span class="text-slate-700"><strong>Staf Keuangan:</strong> Dapat memasukkan catatan transaksi kas baru, namun tidak memiliki wewenang persetujuan pencairan.</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="h-1.5 w-1.5 bg-amber-500 rounded-full mt-1.5 shrink-0"></span>
-                                    <span class="text-slate-700"><strong>Karyawan & Pengguna Umum:</strong> Memiliki perilaku setara dengan wewenang terbatas (read-only untuk modul pencatatan finansial).</span>
+                                <li class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                                    <span class="h-2 w-2 bg-amber-500 rounded-full mt-1 shrink-0"></span>
+                                    <span class="text-slate-700"><strong>Karyawan & Pengguna Umum:</strong> Memiliki wewenang terbatas (read-only untuk modul pencatatan finansial & laporan).</span>
                                 </li>
                             </ul>
                         </div>
@@ -197,4 +160,80 @@
                 </div>
         </main>
     </x-layout.shell>
+
+    <!-- Chart.js Library & Script -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('financialTrendChart');
+            if (!ctx) return;
+
+            const chartData = @js($chartData);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [
+                        {
+                            label: 'Penerimaan Kas',
+                            data: chartData.receipts,
+                            borderColor: '#059669',
+                            backgroundColor: 'rgba(5, 150, 105, 0.08)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#059669',
+                            pointHoverRadius: 6,
+                        },
+                        {
+                            label: 'Pengeluaran Kas',
+                            data: chartData.disbursements,
+                            borderColor: '#DC2626',
+                            backgroundColor: 'rgba(220, 38, 38, 0.08)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#DC2626',
+                            pointHoverRadius: 6,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let value = context.raw || 0;
+                                    return context.dataset.label + ': Rp ' + new Intl.NumberFormat('id-ID').format(value);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Segoe UI', size: 11 }, color: '#64748B' }
+                        },
+                        y: {
+                            grid: { color: '#F1F5F9' },
+                            ticks: {
+                                font: { family: 'Segoe UI', size: 11 },
+                                color: '#64748B',
+                                callback: function (value) {
+                                    return 'Rp ' + (value / 1000000).toFixed(0) + ' Jt';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </x-app-layout>
+

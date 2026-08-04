@@ -42,7 +42,7 @@
                                 <label for="year" class="text-xs font-medium text-slate-500 mb-1">Tahun</label>
                                 <select name="year" id="year"
                                         onchange="this.form.submit()"
-                                        class="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500/20 focus:border-red-400 transition-colors bg-white">
+                                        class="px-3 py-2 pr-10 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500/20 focus:border-sky-400 transition-colors bg-white">
                                     @for ($y = $current_year; $y >= $current_year - 5; $y--)
                                         <option value="{{ $y }}" {{ $report['year'] == $y ? 'selected' : '' }}>
                                             {{ $y }}

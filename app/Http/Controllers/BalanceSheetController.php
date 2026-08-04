@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\BalanceSheetService;
 use App\Exports\BalanceSheetExport;
-use Illuminate\Http\Request;
+use App\Http\Requests\BalanceSheetRequest;
 use Maatwebsite\Excel\Facades\Excel;
 
 class BalanceSheetController extends Controller
@@ -16,26 +16,18 @@ class BalanceSheetController extends Controller
     /**
      * Menampilkan halaman laporan posisi keuangan (balance sheet).
      */
-    public function index(Request $request)
+    public function index(BalanceSheetRequest $request)
     {
-        $request->validate([
-            'year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
-        ]);
-
-        return view('pages.balance-sheet', $this->service->getPageData($request->only('year')));
+        return view('pages.balance-sheet', $this->service->getPageData($request->validated()));
     }
 
     /**
      * Mengekspor data balance sheet ke file Excel.
      */
-    public function export(Request $request)
+    public function export(BalanceSheetRequest $request)
     {
-        $request->validate([
-            'year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
-        ]);
-
-        $filters    = $request->only('year');
-        $pageData   = $this->service->getPageData($filters);
+        $validated  = $request->validated();
+        $pageData   = $this->service->getPageData($validated);
         $report     = $pageData['report'];
         $year       = $report['year'];
 

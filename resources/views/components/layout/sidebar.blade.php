@@ -4,8 +4,8 @@
        
     <div class="flex-1 flex flex-col min-h-0 overflow-y-auto">
         <!-- Brand / Logo -->
-        <div class="h-16 flex items-center px-6 border-b border-slate-200 gap-3">
-            <div class="p-1.5 bg-red-50 border border-red-200 rounded-lg">
+        <div class="py-5 px-6 flex items-center border-b border-slate-200 gap-3 shrink-0">
+            <div class="p-2 bg-red-50 border border-red-200 rounded-xl flex items-center justify-center">
                 <x-atoms.icon name="logo" class="h-6 w-6 text-red-600" />
             </div>
             <span class="font-bold text-lg text-slate-900 tracking-wider">PMI Nganjuk</span>
@@ -75,8 +75,9 @@
                 </div>
             @endforeach
             
-            <!-- Static link: Profile -->
-            <div class="pt-4 border-t border-slate-100">
+            <!-- Static link: Manual Book & Profile -->
+            <div class="pt-4 border-t border-slate-100 space-y-1">
+                <x-molecules.nav-link route="manual-book.download" icon="document" label="Download Manual Book" />
                 <x-molecules.nav-link route="profile.show" icon="user" label="Profil Saya" />
             </div>
         </nav>
