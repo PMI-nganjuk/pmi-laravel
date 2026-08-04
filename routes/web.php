@@ -167,3 +167,6 @@ Route::middleware('auth')->prefix('profile')->name('profile.')->group(function (
     Route::put('/info', [ProfileController::class, 'updateInfo'])->name('update-info');
     Route::put('/password', [ProfileController::class, 'updatePassword'])->name('update-password');
 });
+
+// Manual Book download route
+Route::middleware('auth')->get('/manual-book/download', [SettingController::class, 'downloadManualBook'])->name('manual-book.download');

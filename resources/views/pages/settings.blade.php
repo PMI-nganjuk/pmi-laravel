@@ -34,7 +34,7 @@
             >
                 <div class="mb-6 border-b border-surface-border pb-5">
                     <h2 id="settings-form-title" class="text-lg font-bold text-content-base">Profil Organisasi</h2>
-                    <p class="mt-1 text-sm text-content-muted">Perbarui profil dan periode buku organisasi PMI.</p>
+                    <p class="mt-1 text-sm text-content-muted">Perbarui profil dan pengurus organisasi PMI.</p>
                 </div>
 
                 <form
@@ -108,14 +108,14 @@
                         <div class="bg-surface-base border border-surface-border rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                             <div>
                                 <h4 class="font-bold text-content-base">Panduan Penggunaan Aplikasi</h4>
-                                <p class="text-sm text-content-muted mt-1">Akses dokumen panduan lengkap untuk mempelajari cara penggunaan sistem keuangan ini.</p>
+                                <p class="text-sm text-content-muted mt-1">Unduh dokumen panduan lengkap untuk mempelajari cara penggunaan sistem keuangan ini.</p>
                             </div>
                             <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
                                 <x-atoms.button 
                                     type="button" 
                                     variant="outline" 
                                     size="md" 
-                                    @click="navigator.clipboard.writeText('#'); alert('Link Manual Book berhasil disalin!')"
+                                    @click="navigator.clipboard.writeText('{{ route('manual-book.download') }}'); alert('Link Manual Book berhasil disalin!')"
                                     class="w-full sm:w-auto justify-center"
                                 >
                                     <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -124,7 +124,7 @@
                                     Salin Link
                                 </x-atoms.button>
 
-                                <a href="#" target="_blank" class="w-full sm:w-auto">
+                                <a href="{{ route('manual-book.download') }}" target="_blank" class="w-full sm:w-auto">
                                     <x-atoms.button 
                                         type="button" 
                                         variant="info" 
@@ -134,7 +134,7 @@
                                         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                         </svg>
-                                        Buka Manual Book
+                                        Unduh Manual Book (.docx)
                                     </x-atoms.button>
                                 </a>
                             </div>
@@ -143,6 +143,7 @@
 
                     <!-- Submit Button -->
                     <div class="pt-5 border-t border-surface-border flex justify-end">
+
                         <x-atoms.button
                             type="submit"
                             variant="primary"
