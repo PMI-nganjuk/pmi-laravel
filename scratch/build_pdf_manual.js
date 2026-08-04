@@ -32,6 +32,8 @@ const ssCashFlow = getBase64Image('ss_cash_flow.png');
 const ssAnalysisNotes = getBase64Image('ss_analysis_notes.png');
 const ssUsers = getBase64Image('ss_users.png');
 const ssSettings = getBase64Image('ss_settings.png');
+const ssPrograms = getBase64Image('ss_programs.png');
+const ssProfile = getBase64Image('ss_profile.png');
 
 const htmlContent = `
 <!DOCTYPE html>
@@ -201,6 +203,44 @@ const htmlContent = `
         .page-break {
             page-break-after: always;
         }
+
+        /* TOC Styles */
+        .toc-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #991b1b;
+            text-transform: uppercase;
+            border-bottom: 2px solid #fee2e2;
+            padding-bottom: 6px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+        .toc-chapter {
+            font-weight: 700;
+            font-size: 12px;
+            color: #0f172a;
+            margin-top: 12px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: baseline;
+        }
+        .toc-sub {
+            font-weight: 500;
+            font-size: 11px;
+            color: #334155;
+            padding-left: 16px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: baseline;
+        }
+        .toc-dots {
+            flex-grow: 1;
+            border-bottom: 1px dotted #cbd5e1;
+            margin: 0 8px;
+            position: relative;
+            top: -3px;
+        }
     </style>
 </head>
 <body>
@@ -239,6 +279,67 @@ const htmlContent = `
         <div class="cover-meta">
             Hak Cipta © 2026 Palang Merah Indonesia Kabupaten Nganjuk. Seluruh hak cipta dilindungi undang-undang.<br>
             Dilarang menggandakan atau menyebarluaskan dokumen ini tanpa izin tertulis dari Pengurus PMI Nganjuk.
+        </div>
+    </div>
+
+    <!-- Halaman Daftar Isi -->
+    <div class="page-break">
+        <div class="toc-title">DAFTAR ISI</div>
+        <div>
+            <div class="toc-chapter">
+                <span>BAB I: PENDAHULUAN</span>
+                <span class="toc-dots"></span>
+            </div>
+            <div class="toc-sub"><span>1.1 Maksud dan Tujuan Dokumen</span><span class="toc-dots"></span></div>
+            <div class="toc-sub"><span>1.2 Ruang Lingkup Sistem</span><span class="toc-dots"></span></div>
+            <div class="toc-sub"><span>1.3 Matriks Otoritas Peran (Role-Based Access Control)</span><span class="toc-dots"></span></div>
+
+            <div class="toc-chapter">
+                <span>BAB II: AUTENTIKASI & STRUKTUR NAVIGASI</span>
+                <span class="toc-dots"></span>
+            </div>
+            <div class="toc-sub"><span>2.1 Autentikasi Pengguna (Halaman Login)</span><span class="toc-dots"></span></div>
+            <div class="toc-sub"><span>2.2 Struktur Navigasi Utama (Sidebar Menu)</span><span class="toc-dots"></span></div>
+
+            <div class="toc-chapter">
+                <span>BAB III: MODUL EXECUTIVE DASHBOARD</span>
+                <span class="toc-dots"></span>
+            </div>
+            <div class="toc-sub"><span>3.1 Ikhtisar Dashboard & Telemetri Realtime</span><span class="toc-dots"></span></div>
+            <div class="toc-sub"><span>3.2 Rincian Indikator & Telemetri Sistem</span><span class="toc-dots"></span></div>
+
+            <div class="toc-chapter">
+                <span>BAB IV: OPERASIONAL MODUL TRANSAKSI KEUANGAN</span>
+                <span class="toc-dots"></span>
+            </div>
+            <div class="toc-sub"><span>4.1 Pencatatan Transaksi Penerimaan Kas (BKMUDD)</span><span class="toc-dots"></span></div>
+            <div class="toc-sub"><span>4.2 Pencatatan Transaksi Pengeluaran Kas (BKKUDD)</span><span class="toc-dots"></span></div>
+
+            <div class="toc-chapter">
+                <span>BAB V: MODUL BAGAN AKUN & JURNAL PENYESUAIAN</span>
+                <span class="toc-dots"></span>
+            </div>
+            <div class="toc-sub"><span>5.1 Pengelolaan Chart of Accounts (COA)</span><span class="toc-dots"></span></div>
+            <div class="toc-sub"><span>5.2 Modul Jurnal Penyesuaian (BKJUDD)</span><span class="toc-dots"></span></div>
+
+            <div class="toc-chapter">
+                <span>BAB VI: MODUL LAPORAN KEUANGAN TERPADU</span>
+                <span class="toc-dots"></span>
+            </div>
+            <div class="toc-sub"><span>6.1 Laporan Buku Besar (General Ledger)</span><span class="toc-dots"></span></div>
+            <div class="toc-sub"><span>6.2 Laporan Laba Rugi (Profit & Loss Statement)</span><span class="toc-dots"></span></div>
+            <div class="toc-sub"><span>6.3 Laporan Posisi Keuangan (Balance Sheet / Neraca)</span><span class="toc-dots"></span></div>
+            <div class="toc-sub"><span>6.4 Laporan Arus Kas (Cash Flow Statement)</span><span class="toc-dots"></span></div>
+            <div class="toc-sub"><span>6.5 Laporan Perubahan Aset Netto (Statement of Changes in Net Assets)</span><span class="toc-dots"></span></div>
+
+            <div class="toc-chapter">
+                <span>BAB VII: MODUL ADMINISTRASI SISTEM & PROFIL</span>
+                <span class="toc-dots"></span>
+            </div>
+            <div class="toc-sub"><span>7.1 Manajemen Akun Pengguna</span><span class="toc-dots"></span></div>
+            <div class="toc-sub"><span>7.2 Konfigurasi Parameter Profil Organisasi</span><span class="toc-dots"></span></div>
+            <div class="toc-sub"><span>7.3 Manajemen Master Program Kerja</span><span class="toc-dots"></span></div>
+            <div class="toc-sub"><span>7.4 Pengaturan Profil Pengguna (Profil Saya)</span><span class="toc-dots"></span></div>
         </div>
     </div>
 
@@ -470,6 +571,31 @@ const htmlContent = `
             <img src="${ssBalanceSheet}" alt="Laporan Posisi Keuangan">
             <div class="img-caption">Gambar 6.3: Laporan Posisi Keuangan (Neraca)</div>
         </div>
+
+        <h2>6.4 Laporan Arus Kas (Cash Flow Statement)</h2>
+        <p>Modul Laporan Arus Kas menyajikan informasi aliran kas masuk (penerimaan) dan kas keluar (pengeluaran) organisasi Palang Merah Indonesia Kabupaten Nganjuk yang diklasifikasikan ke dalam 3 (tiga) kategori aktivitas utama akuntansi:</p>
+        <ul>
+            <li><strong>Aktivitas Operasi:</strong> Mencakup penerimaan dari penyumbang/donatur, penerimaan bunga, penerimaan jasa pengolahan darah, pembayaran kepada pemasok/penerima hibah, serta beban gaji & kesejahteraan pegawai.</li>
+            <li><strong>Aktivitas Investasi:</strong> Mencakup arus kas terkait perolehan atau pelepasan aset tetap dan investasi jangka panjang.</li>
+            <li><strong>Aktivitas Pendanaan:</strong> Mencakup penerimaan dan penolakan/pembayaran kembali kewajiban utang antar lembaga atau pinjaman operasional.</li>
+        </ul>
+        <p>Di bagian akhir laporan disajikan perhitungan <em>Kenaikan/Penurunan Bersih Kas</em>, <em>Saldo Kas Awal Tahun</em>, serta <em>Saldo Kas Akhir Tahun</em> yang secara otomatis terekonsiliasi dan cocok dengan saldo kas pada Laporan Posisi Keuangan (Neraca). Pengguna juga dapat memilih filter tahun anggaran dan mengunduh berkas fisik dalam format Excel (<code>.xlsx</code>).</p>
+        <div class="img-container">
+            <img src="${ssCashFlow}" alt="Laporan Arus Kas">
+            <div class="img-caption">Gambar 6.4: Antarmuka Laporan Arus Kas (Cash Flow Statement)</div>
+        </div>
+
+        <h2>6.5 Laporan Perubahan Aset Netto (Statement of Changes in Net Assets / Netto)</h2>
+        <p>Modul Laporan Perubahan Aset Netto menyajikan rekapitulasi mutasi dan perubahan saldo ekuitas organisasi nirlaba sesuai dengan standar pelaporan akuntansi entitas nirlaba (ISAK 35 / PSAK 45). Laporan ini terbagi menjadi dua klasifikasi utama aset netto:</p>
+        <ul>
+            <li><strong>Aset Netto Tidak Terikat:</strong> Sumber daya yang penggunaannya tidak dibatasi oleh donor/pemberi hibah. Kenaikan/penurunan berasal dari surplus/defisit operasional berjalan.</li>
+            <li><strong>Aset Netto Terikat:</strong> Sumber daya yang penggunaannya dibatasi oleh donor untuk tujuan atau periode waktu tertentu.</li>
+        </ul>
+        <p>Laporan ini menampilkan <em>Saldo Aset Netto Awal Tahun</em>, <em>Pendapatan Netto / Perubahan Periode Berjalan</em>, serta <em>Saldo Aset Netto Akhir Tahun</em> yang terintegrasi secara otomatis dengan pos Ekuitas (Aset Netto) pada Laporan Posisi Keuangan (Neraca). Dilengkapi dengan fitur penyesuaian tahun laporan dan unduh dokumen spreadsheet (<code>.xlsx</code>).</p>
+        <div class="img-container">
+            <img src="${ssAnalysisNotes}" alt="Laporan Perubahan Aset Netto">
+            <div class="img-caption">Gambar 6.5: Antarmuka Laporan Perubahan Aset Netto</div>
+        </div>
     </div>
 
     <!-- BAB 7: ADMINISTRASI SISTEM -->
@@ -488,6 +614,20 @@ const htmlContent = `
         <div class="img-container">
             <img src="${ssSettings}" alt="Konfigurasi Profil Organisasi">
             <div class="img-caption">Gambar 7.2: Pengaturan Profil Organisasi</div>
+        </div>
+
+        <h2>7.3 Manajemen Master Program Kerja</h2>
+        <p>Modul Manajemen Program Kerja digunakan untuk mendata seluruh perencanaan kegiatan dan program operasional PMI Kabupaten Nganjuk beserta Person In Charge (PIC) pelaksana. Administrator dapat menginput program kerja baru, memperbarui informasi PIC, dan mengelola direktori program secara terpusat.</p>
+        <div class="img-container">
+            <img src="${ssPrograms}" alt="Manajemen Program Kerja">
+            <div class="img-caption">Gambar 7.3: Antarmuka Kelola Master Program Kerja</div>
+        </div>
+
+        <h2>7.4 Pengaturan Profil Pengguna (Profil Saya)</h2>
+        <p>Modul Profil Saya memungkinkan setiap pengguna yang sedang aktif (login) untuk mengelola data akun pribadi secara mandiri. Pengguna dapat memperbarui Nama Lengkap, Alamat Email terdaftar, serta melakukan penggantian Kata Sandi (Password) secara berkala demi menjaga keamanan akun.</p>
+        <div class="img-container">
+            <img src="${ssProfile}" alt="Pengaturan Profil Pengguna">
+            <div class="img-caption">Gambar 7.4: Antarmuka Pengaturan Profil Saya & Keamanan Akun</div>
         </div>
 
         <div class="note-box">
