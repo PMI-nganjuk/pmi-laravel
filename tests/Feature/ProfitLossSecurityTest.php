@@ -21,16 +21,16 @@ class ProfitLossSecurityTest extends TestCase
     }
 
     /**
-     * Memastikan karyawan biasa tanpa izin keuangan tidak dapat mengakses halaman laba rugi.
+     * Memastikan karyawan biasa dengan peran STAFF memiliki akses baca ke halaman laba rugi sesuai Manual Book 1.3.
      */
-    public function test_unauthorized_user_cannot_access_profit_loss_page(): void
+    public function test_staff_user_can_access_profit_loss_page(): void
     {
         $user = User::factory()->create([
             'role' => RoleEnum::STAFF,
         ]);
 
         $response = $this->actingAs($user)->get(route('profit-loss.index'));
-        $response->assertStatus(403);
+        $response->assertStatus(200);
     }
 
     /**

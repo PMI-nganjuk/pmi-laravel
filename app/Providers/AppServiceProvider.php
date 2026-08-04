@@ -39,9 +39,9 @@ class AppServiceProvider extends ServiceProvider
             return false; // Normal users are denied; Admins bypass this via Gate::before
         });
 
-        // Define gates for finance module access
+        // Define gates for finance module access (Read-only for Staff & Pengguna Umum per Manual Book 1.3)
         Gate::define('finance.view', function ($user) {
-            return $user->hasRole(RoleEnum::FINANCE_STAFF);
+            return $user->hasAnyRole([RoleEnum::FINANCE_STAFF, RoleEnum::STAFF, RoleEnum::USER]);
         });
 
         Gate::define('finance.create', function ($user) {
