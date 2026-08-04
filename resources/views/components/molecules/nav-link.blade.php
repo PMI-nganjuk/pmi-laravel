@@ -16,12 +16,11 @@
    @endif
 
    @class([
-       'flex items-center px-4 py-3 rounded-lg transition duration-200 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500',
-       'bg-primary-50 text-primary-600 border-l-4 border-primary-500 font-semibold rounded-l-none' => $active && !$isDisabled, 
-       'text-content-muted hover:bg-surface-hover hover:text-content-base' => !$active && !$isDisabled,
+       'flex items-center px-3.5 py-2.5 rounded-xl transition duration-200 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 text-sm',
+       'bg-primary-50 text-primary-600 border-l-4 border-primary-500 font-semibold pl-[10px] pr-3.5 rounded-l-none' => $active && !$isDisabled, 
+       'text-content-muted hover:bg-surface-hover hover:text-content-base font-medium' => !$active && !$isDisabled,
        'opacity-50 cursor-not-allowed bg-transparent text-content-subtle' => $isDisabled,
-   ])
-   aria-current="{{ $active ? 'page' : 'false' }}">
+   ])>
    
     <x-atoms.icon :name="$icon" 
         @class([

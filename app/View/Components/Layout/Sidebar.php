@@ -33,6 +33,12 @@ class Sidebar extends Component
                 'icon'  => 'home',
                 'active'=> request()->routeIs('dashboard')
             ],
+            [
+                'label' => 'Manual Book',
+                'route' => 'manual-book.download',
+                'icon'  => 'document',
+                'active'=> false
+            ],
         ];
 
         $sections[] = [
