@@ -20,6 +20,7 @@ class OrganizationProfile extends Model
         'financial_period_start',
         'financial_period_end',
         'fiscal_year',
+        'manual_book_link',
     ];
 
     protected $casts = [
