@@ -165,6 +165,10 @@ jobs:
               $PHP_BIN artisan db:seed --force
             fi
             
+            # Verifikasi jumlah akun di database
+            echo "👥 Daftar Akun di Database:"
+            $PHP_BIN artisan tinker --execute="foreach(\App\Models\User::all() as \$u) { echo ' - ' . \$u->email . ' [' . \$u->role->value . ']' . PHP_EOL; }"
+            
             # Optimasi cache Laravel
             $PHP_BIN artisan optimize:clear
             $PHP_BIN artisan config:cache
