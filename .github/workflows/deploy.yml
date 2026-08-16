@@ -80,17 +80,32 @@ jobs:
           script: |
             cd ${{ secrets.HOSTINGER_TARGET_DIR || 'public_html' }}
             
+            # Cari binary PHP 8.3+ di Hostinger jika default CLI masih PHP 8.2
+            if command -v php8.3 > /dev/null 2>&1; then
+              PHP_BIN="php8.3"
+            elif [ -f "/usr/bin/php8.3" ]; then
+              PHP_BIN="/usr/bin/php8.3"
+            elif [ -f "/usr/local/bin/php8.3" ]; then
+              PHP_BIN="/usr/local/bin/php8.3"
+            elif [ -f "/opt/alt/php83/usr/bin/php" ]; then
+              PHP_BIN="/opt/alt/php83/usr/bin/php"
+            else
+              PHP_BIN="php"
+            fi
+            
+            echo "Menggunakan PHP binary: $($PHP_BIN -v | head -n 1)"
+            
             # Buat link storage jika belum ada
-            php artisan storage:link || true
+            $PHP_BIN artisan storage:link || true
             
             # Jalankan database migrations
-            php artisan migrate --force
+            $PHP_BIN artisan migrate --force
             
             # Optimasi cache Laravel
-            php artisan optimize:clear
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
+            $PHP_BIN artisan optimize:clear
+            $PHP_BIN artisan config:cache
+            $PHP_BIN artisan route:cache
+            $PHP_BIN artisan view:cache
             
             # Set permission folder storage & cache
             chmod -R 775 storage bootstrap/cache
