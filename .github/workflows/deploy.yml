@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - main
-      - dev # Diaktifkan jika ingin deploy langsung saat push ke dev
-  workflow_dispatch: # Memungkinkan deploy manual dari tab Actions di GitHub
+      - dev
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -28,10 +28,10 @@ jobs:
           composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress
 
       # 2. Setup Node.js & Compile Assets (Vite)
-      - name: 🟢 Setup Node.js 20
+      - name: 🟢 Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: 🔨 Install NPM Dependencies & Build Assets
@@ -39,40 +39,43 @@ jobs:
           npm ci
           npm run build
 
-      # 3. Bersihkan file/folder yang tidak dibutuhkan di production sebelum sync
+      # 3. Bersihkan file yang tidak diperlukan di server
       - name: 🧹 Cleanup Unnecessary Files
         run: |
           rm -rf node_modules
           rm -rf .github
           rm -rf tests
 
-      # =========================================================================
-      # METODE 1: DEPLOY VIA SSH / RSYNC (SANGAT DIREKOMENDASIKAN & LEBIH CEPAT)
-      # =========================================================================
-      - name: 🚀 Sync Files via SSH (Rsync)
-        uses: easingthemes/ssh-deploy@v5.1.0
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
-          REMOTE_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
-          REMOTE_USER: ${{ secrets.HOSTINGER_SSH_USER }}
-          REMOTE_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
-          TARGET: ${{ secrets.HOSTINGER_TARGET_DIR || 'public_html' }}
-          ARGS: "-rlgoDzc -i --delete"
-          EXCLUDE: |
-            /.git/
-            /.env
-            /storage/logs/
-            /storage/framework/cache/
-            /storage/framework/sessions/
-            /storage/framework/views/
+      # 4. Sync Files via Rsync over SSH (Password Auth)
+      - name: 🚀 Sync Files via Rsync over SSH
+        env:
+          SSH_PASSWORD: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
+          TARGET_DIR: ${{ secrets.HOSTINGER_TARGET_DIR || 'public_html' }}
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq sshpass rsync
+          export SSHPASS="$SSH_PASSWORD"
+          sshpass -e rsync -avz --delete \
+            -e "ssh -p $SSH_PORT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+            --exclude="/.git/" \
+            --exclude="/.github/" \
+            --exclude="/.env" \
+            --exclude="/node_modules/" \
+            --exclude="/tests/" \
+            --exclude="/storage/logs/*" \
+            --exclude="/storage/framework/cache/*" \
+            --exclude="/storage/framework/sessions/*" \
+            --exclude="/storage/framework/views/*" \
+            ./ "$SSH_USER@$SSH_HOST:$TARGET_DIR"
 
-      # 4. Jalankan Artisan Commands di Hostinger via SSH
+      # 5. Jalankan Artisan Commands di Hostinger via SSH
       - name: ⚙️ Run Post-Deployment Commands on Hostinger
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOSTINGER_SSH_HOST }}
           username: ${{ secrets.HOSTINGER_SSH_USER }}
-          key: ${{ secrets.HOSTINGER_SSH_KEY }}
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           port: ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}
           script: |
