@@ -30,6 +30,7 @@ class OrganizationProfileRequest extends FormRequest
             'financial_period_start' => ['nullable', 'date'],
             'financial_period_end' => ['nullable', 'date', 'after_or_equal:financial_period_start'],
             'fiscal_year' => ['nullable', 'integer', 'min:1900', 'max:2100'],
+            'manual_book_link' => ['nullable', 'url', 'max:1000'],
         ];
     }
 
@@ -47,6 +48,7 @@ class OrganizationProfileRequest extends FormRequest
             'financial_period_start' => 'periode awal',
             'financial_period_end' => 'periode akhir',
             'fiscal_year' => 'tahun buku',
+            'manual_book_link' => 'link manual book',
         ];
     }
 }

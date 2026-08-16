@@ -120,9 +120,14 @@
 
                         <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                             <span>Data otomatis diperbarui dari entri transaksi kas</span>
-                            <a href="{{ route('manual-book.download') }}" target="_blank" class="inline-flex items-center gap-1 text-red-600 hover:text-red-700 font-bold">
-                                Unduh Manual Book (PDF)
-                            </a>
+                            <div class="flex items-center gap-3">
+                                <a href="{{ route('manual-book.download-docx') }}?v={{ time() }}" target="_blank" class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-bold">
+                                    Unduh (.docx)
+                                </a>
+                                <a href="{{ route('manual-book.download') }}?v={{ time() }}" target="_blank" class="inline-flex items-center gap-1 text-red-600 hover:text-red-700 font-bold">
+                                    Unduh (.pdf)
+                                </a>
+                            </div>
                         </div>
                     </div>
 
