@@ -57,17 +57,29 @@ jobs:
           sudo apt-get update -qq && sudo apt-get install -y -qq sshpass rsync
           export SSHPASS="$SSH_PASSWORD"
           
-          # Normalisasi path absolut Hostinger (/home/u868459765/public_html/)
-          CLEAN_TARGET="${RAW_TARGET#/}"
-          if [[ "$CLEAN_TARGET" == home/* ]]; then
-            TARGET_PATH="/$CLEAN_TARGET"
-          elif [[ "$RAW_TARGET" == /* && "$RAW_TARGET" != /public_html* ]]; then
-            TARGET_PATH="$RAW_TARGET"
+          # Deteksi otomatis folder domain di Hostinger (domains/pmikabnganjuk.oproject.id/public_html)
+          DETECTED_PATH=$(sshpass -e ssh -p $SSH_PORT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_USER@$SSH_HOST" '
+            if [ -d "/home/'"$SSH_USER"'/domains/pmikabnganjuk.oproject.id/public_html" ]; then
+              echo "/home/'"$SSH_USER"'/domains/pmikabnganjuk.oproject.id/public_html"
+            elif [ -d "/home/'"$SSH_USER"'/domains" ] && [ "$(ls -A /home/'"$SSH_USER"'/domains 2>/dev/null)" ]; then
+              DOM_NAME=$(ls -1 /home/'"$SSH_USER"'/domains | head -n 1)
+              if [ -d "/home/'"$SSH_USER"'/domains/$DOM_NAME/public_html" ]; then
+                echo "/home/'"$SSH_USER"'/domains/$DOM_NAME/public_html"
+              fi
+            fi
+          ')
+          
+          if [ -n "$DETECTED_PATH" ]; then
+            TARGET_PATH="${DETECTED_PATH%/}/"
           else
-            TARGET_PATH="/home/$SSH_USER/${CLEAN_TARGET}"
+            CLEAN_TARGET="${RAW_TARGET#/}"
+            if [[ "$CLEAN_TARGET" == home/* ]]; then
+              TARGET_PATH="/$CLEAN_TARGET"
+            else
+              TARGET_PATH="/home/$SSH_USER/${CLEAN_TARGET}"
+            fi
+            TARGET_PATH="${TARGET_PATH%/}/"
           fi
-          # Pastikan trailing slash ada
-          TARGET_PATH="${TARGET_PATH%/}/"
           
           echo "=========================================="
           echo "📡 Menghubungkan ke Hostinger: $SSH_USER@$SSH_HOST:$SSH_PORT"
@@ -104,13 +116,14 @@ jobs:
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           port: ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}
           script: |
-            # Normalisasi path
-            RAW_DIR="${{ secrets.HOSTINGER_TARGET_DIR || 'public_html' }}"
-            CLEAN_DIR="${RAW_DIR#/}"
-            if [ -d "/home/${{ secrets.HOSTINGER_SSH_USER }}/$CLEAN_DIR" ]; then
-              cd "/home/${{ secrets.HOSTINGER_SSH_USER }}/$CLEAN_DIR"
-            elif [ -d "$RAW_DIR" ]; then
-              cd "$RAW_DIR"
+            # Deteksi direktori domain
+            if [ -d "/home/${{ secrets.HOSTINGER_SSH_USER }}/domains/pmikabnganjuk.oproject.id/public_html" ]; then
+              cd "/home/${{ secrets.HOSTINGER_SSH_USER }}/domains/pmikabnganjuk.oproject.id/public_html"
+            elif [ -d "/home/${{ secrets.HOSTINGER_SSH_USER }}/domains" ] && [ "$(ls -A /home/${{ secrets.HOSTINGER_SSH_USER }}/domains 2>/dev/null)" ]; then
+              DOM_NAME=$(ls -1 /home/${{ secrets.HOSTINGER_SSH_USER }}/domains | head -n 1)
+              cd "/home/${{ secrets.HOSTINGER_SSH_USER }}/domains/$DOM_NAME/public_html"
+            elif [ -d "/home/${{ secrets.HOSTINGER_SSH_USER }}/public_html" ]; then
+              cd "/home/${{ secrets.HOSTINGER_SSH_USER }}/public_html"
             else
               cd public_html || cd ~/public_html
             fi
