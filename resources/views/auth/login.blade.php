@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout title="Masuk">
     <div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-slate-50 font-sans text-slate-900 antialiased">
         <div class="sm:mx-auto sm:w-full sm:max-w-md text-center">
             <!-- Brand Logo / Badge -->
