@@ -52,10 +52,32 @@ jobs:
           SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
           SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
           SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
-          TARGET_DIR: ${{ secrets.HOSTINGER_TARGET_DIR || 'public_html' }}
+          RAW_TARGET: ${{ secrets.HOSTINGER_TARGET_DIR || 'public_html' }}
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq sshpass rsync
           export SSHPASS="$SSH_PASSWORD"
+          
+          # Normalisasi path absolut Hostinger (/home/u868459765/public_html/)
+          CLEAN_TARGET="${RAW_TARGET#/}"
+          if [[ "$CLEAN_TARGET" == home/* ]]; then
+            TARGET_PATH="/$CLEAN_TARGET"
+          elif [[ "$RAW_TARGET" == /* && "$RAW_TARGET" != /public_html* ]]; then
+            TARGET_PATH="$RAW_TARGET"
+          else
+            TARGET_PATH="/home/$SSH_USER/${CLEAN_TARGET}"
+          fi
+          # Pastikan trailing slash ada
+          TARGET_PATH="${TARGET_PATH%/}/"
+          
+          echo "=========================================="
+          echo "📡 Menghubungkan ke Hostinger: $SSH_USER@$SSH_HOST:$SSH_PORT"
+          echo "📁 Target Direktori: $TARGET_PATH"
+          echo "=========================================="
+          
+          # Buat folder target jika belum ada
+          sshpass -e ssh -p $SSH_PORT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_USER@$SSH_HOST" "mkdir -p $TARGET_PATH"
+          
+          # Sync files
           sshpass -e rsync -avz --delete \
             -e "ssh -p $SSH_PORT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
             --exclude="/.git/" \
@@ -67,7 +89,11 @@ jobs:
             --exclude="/storage/framework/cache/*" \
             --exclude="/storage/framework/sessions/*" \
             --exclude="/storage/framework/views/*" \
-            ./ "$SSH_USER@$SSH_HOST:$TARGET_DIR"
+            ./ "$SSH_USER@$SSH_HOST:$TARGET_PATH"
+            
+          echo "=========================================="
+          echo "✅ Sinkronisasi Berkas Selesai!"
+          echo "=========================================="
 
       # 5. Jalankan Artisan Commands di Hostinger via SSH
       - name: ⚙️ Run Post-Deployment Commands on Hostinger
@@ -78,9 +104,20 @@ jobs:
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           port: ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}
           script: |
-            cd ${{ secrets.HOSTINGER_TARGET_DIR || 'public_html' }}
+            # Normalisasi path
+            RAW_DIR="${{ secrets.HOSTINGER_TARGET_DIR || 'public_html' }}"
+            CLEAN_DIR="${RAW_DIR#/}"
+            if [ -d "/home/${{ secrets.HOSTINGER_SSH_USER }}/$CLEAN_DIR" ]; then
+              cd "/home/${{ secrets.HOSTINGER_SSH_USER }}/$CLEAN_DIR"
+            elif [ -d "$RAW_DIR" ]; then
+              cd "$RAW_DIR"
+            else
+              cd public_html || cd ~/public_html
+            fi
             
-            # Cari binary PHP 8.3+ di Hostinger jika default CLI masih PHP 8.2
+            echo "📂 Direktori aktif saat ini: $(pwd)"
+            
+            # Cari binary PHP 8.3+ di Hostinger
             if command -v php8.3 > /dev/null 2>&1; then
               PHP_BIN="php8.3"
             elif [ -f "/usr/bin/php8.3" ]; then
@@ -89,11 +126,13 @@ jobs:
               PHP_BIN="/usr/local/bin/php8.3"
             elif [ -f "/opt/alt/php83/usr/bin/php" ]; then
               PHP_BIN="/opt/alt/php83/usr/bin/php"
+            elif [ -f "/usr/local/php83/bin/php" ]; then
+              PHP_BIN="/usr/local/php83/bin/php"
             else
               PHP_BIN="php"
             fi
             
-            echo "Menggunakan PHP binary: $($PHP_BIN -v | head -n 1)"
+            echo "🐘 Menggunakan PHP binary: $($PHP_BIN -v | head -n 1)"
             
             # Buat link storage jika belum ada
             $PHP_BIN artisan storage:link || true
@@ -109,3 +148,5 @@ jobs:
             
             # Set permission folder storage & cache
             chmod -R 775 storage bootstrap/cache
+            
+            echo "✨ Deploy Berhasil Selesai!"
