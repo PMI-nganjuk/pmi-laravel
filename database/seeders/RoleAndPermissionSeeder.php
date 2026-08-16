@@ -41,12 +41,14 @@ class RoleAndPermissionSeeder extends Seeder
         ];
 
         foreach ($users as $userData) {
-            User::create([
-                'name' => $userData['name'],
-                'email' => $userData['email'],
-                'password' => $userData['password'],
-                'role' => $userData['role'],
-            ]);
+            User::firstOrCreate(
+                ['email' => $userData['email']],
+                [
+                    'name' => $userData['name'],
+                    'password' => $userData['password'],
+                    'role' => $userData['role'],
+                ]
+            );
         }
     }
 }
