@@ -5,6 +5,12 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      fresh_db:
+        description: 'Jalankan migrate:fresh --seed (HATI-HATI: Menghapus semua data database)'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build-and-deploy:
@@ -45,8 +51,8 @@ jobs:
           rm -rf .github
           rm -rf tests
 
-      # 4. Sync Files via Rsync over SSH (Password Auth)
-      - name: 🚀 Sync Files via Rsync over SSH
+      # 4. Sync Files via Rsync over SSH (Hanya update berkas yang berubah)
+      - name: 🚀 Incremental Sync Files via Rsync over SSH
         env:
           SSH_PASSWORD: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
@@ -86,10 +92,7 @@ jobs:
           echo "📁 Target Direktori: $TARGET_PATH"
           echo "=========================================="
           
-          # Buat folder target jika belum ada
-          sshpass -e ssh -p $SSH_PORT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SSH_USER@$SSH_HOST" "mkdir -p $TARGET_PATH"
-          
-          # Sync files
+          # Sync berkas secara inkremental (hanya file yang berubah, menjaga storage & .env tetap aman)
           sshpass -e rsync -avz --delete \
             -e "ssh -p $SSH_PORT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
             --exclude="/.git/" \
@@ -97,6 +100,7 @@ jobs:
             --exclude="/.env" \
             --exclude="/node_modules/" \
             --exclude="/tests/" \
+            --exclude="/storage/app/public/*" \
             --exclude="/storage/logs/*" \
             --exclude="/storage/framework/cache/*" \
             --exclude="/storage/framework/sessions/*" \
@@ -104,7 +108,7 @@ jobs:
             ./ "$SSH_USER@$SSH_HOST:$TARGET_PATH"
             
           echo "=========================================="
-          echo "✅ Sinkronisasi Berkas Selesai!"
+          echo "✅ Sinkronisasi Inkremental Selesai!"
           echo "=========================================="
 
       # 5. Jalankan Artisan Commands di Hostinger via SSH
@@ -150,8 +154,14 @@ jobs:
             # Buat link storage jika belum ada
             $PHP_BIN artisan storage:link || true
             
-            # Jalankan database migrations
-            $PHP_BIN artisan migrate --force
+            # Jalankan database migration
+            if [ "${{ github.event.inputs.fresh_db }}" = "true" ]; then
+              echo "⚠️ Menjalankan migrate:fresh --seed (Hapus & buat ulang data)..."
+              $PHP_BIN artisan migrate:fresh --seed --force
+            else
+              echo "📦 Menjalankan migrate standar inkremental (Aman untuk data production)..."
+              $PHP_BIN artisan migrate --force
+            fi
             
             # Optimasi cache Laravel
             $PHP_BIN artisan optimize:clear
@@ -162,4 +172,4 @@ jobs:
             # Set permission folder storage & cache
             chmod -R 775 storage bootstrap/cache
             
-            echo "✨ Deploy Berhasil Selesai!"
+            echo "✨ Deploy Inkremental Berhasil Selesai!"
