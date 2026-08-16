@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Enums\RoleEnum;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class RoleAndPermissionSeeder extends Seeder
 {
@@ -41,11 +42,11 @@ class RoleAndPermissionSeeder extends Seeder
         ];
 
         foreach ($users as $userData) {
-            User::firstOrCreate(
+            User::updateOrCreate(
                 ['email' => $userData['email']],
                 [
                     'name' => $userData['name'],
-                    'password' => $userData['password'],
+                    'password' => Hash::make($userData['password']),
                     'role' => $userData['role'],
                 ]
             );
