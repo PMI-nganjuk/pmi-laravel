@@ -1,0 +1,94 @@
+name: Deploy Laravel to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+      - dev # Diaktifkan jika ingin deploy langsung saat push ke dev
+  workflow_dispatch: # Memungkinkan deploy manual dari tab Actions di GitHub
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      # 1. Setup PHP & Composer
+      - name: 🐘 Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, zip, bcmath, fileinfo, gd
+          coverage: none
+
+      - name: 📦 Install Composer Dependencies (Production)
+        run: |
+          composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress
+
+      # 2. Setup Node.js & Compile Assets (Vite)
+      - name: 🟢 Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 🔨 Install NPM Dependencies & Build Assets
+        run: |
+          npm ci
+          npm run build
+
+      # 3. Bersihkan file/folder yang tidak dibutuhkan di production sebelum sync
+      - name: 🧹 Cleanup Unnecessary Files
+        run: |
+          rm -rf node_modules
+          rm -rf .github
+          rm -rf tests
+
+      # =========================================================================
+      # METODE 1: DEPLOY VIA SSH / RSYNC (SANGAT DIREKOMENDASIKAN & LEBIH CEPAT)
+      # =========================================================================
+      - name: 🚀 Sync Files via SSH (Rsync)
+        uses: easingthemes/ssh-deploy@v5.1.0
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          REMOTE_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          REMOTE_PORT: ${{ secrets.HOSTINGER_SSH_PORT || '65002' }}
+          TARGET: ${{ secrets.HOSTINGER_TARGET_DIR || 'public_html' }}
+          ARGS: "-rlgoDzc -i --delete"
+          EXCLUDE: |
+            /.git/
+            /.env
+            /storage/logs/
+            /storage/framework/cache/
+            /storage/framework/sessions/
+            /storage/framework/views/
+
+      # 4. Jalankan Artisan Commands di Hostinger via SSH
+      - name: ⚙️ Run Post-Deployment Commands on Hostinger
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}
+          script: |
+            cd ${{ secrets.HOSTINGER_TARGET_DIR || 'public_html' }}
+            
+            # Buat link storage jika belum ada
+            php artisan storage:link || true
+            
+            # Jalankan database migrations
+            php artisan migrate --force
+            
+            # Optimasi cache Laravel
+            php artisan optimize:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            
+            # Set permission folder storage & cache
+            chmod -R 775 storage bootstrap/cache
