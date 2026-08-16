@@ -46,7 +46,7 @@ class RoleAndPermissionSeeder extends Seeder
                 ['email' => $userData['email']],
                 [
                     'name' => $userData['name'],
-                    'password' => Hash::make($userData['password']),
+                    'password' => $userData['password'],
                     'role' => $userData['role'],
                 ]
             );

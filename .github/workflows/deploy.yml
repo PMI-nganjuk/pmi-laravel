@@ -154,16 +154,9 @@ jobs:
             # Buat link storage jika belum ada
             $PHP_BIN artisan storage:link || true
             
-            # Jalankan database migration & seeder data default
-            if [ "${{ github.event.inputs.fresh_db }}" = "true" ]; then
-              echo "⚠️ Menjalankan migrate:fresh --seed (Hapus & buat ulang data)..."
-              $PHP_BIN artisan migrate:fresh --seed --force
-            else
-              echo "📦 Menjalankan migrate standar inkremental..."
-              $PHP_BIN artisan migrate --force
-              echo "🌱 Menjalankan seeder data awal/default..."
-              $PHP_BIN artisan db:seed --force
-            fi
+            # Jalankan database migration & seeder data default (Membersihkan tabel lama Filament & membuat struktur baru)
+            echo "🚀 Menjalankan migrate:fresh --seed (Inisialisasi struktur baru & data awal)..."
+            $PHP_BIN artisan migrate:fresh --seed --force
             
             # Verifikasi jumlah akun di database
             echo "👥 Daftar Akun di Database:"
